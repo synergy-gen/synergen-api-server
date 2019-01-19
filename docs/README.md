@@ -48,7 +48,7 @@ Then the `_links.self` field under `"foo"` refers to the Foo object instance, an
 - `/users/{id}/objectives/{id}/goals/{id}/tasks/{id}`
 - `/goals/{id}/tasks/{id}`
 - `/objectives/{id}/goals/{id}/tasks/{id}`
-- `/groups/{id}/tasks/{id}`
 - `/groups/{id}/goals/{id}/tasks/{id}`
+- `/groups/{id}/objectives/{id}/goals/{id}/tasks/{id}`
 
 Providing the correct link to the application helps increase the usability of the API.
