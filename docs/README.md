@@ -17,7 +17,7 @@ In addition to the formats specified above, EVERY response will be returned from
 
 ```json
 {
-    "api": "<version>", // The version of the API that responded to the request
+    "api": "<version>", /* The version of the API that responded to the request */
     "success": true,    // Whether the request was successful (for convenience)
     "status": "",       // The string HTTP status type (for convenience)
     "message": "",      // A message from the server
