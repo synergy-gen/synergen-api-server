@@ -11,6 +11,7 @@ The schema of the objects stored in each collection are defined below. Additiona
 ## User
 
 A user is any person using the system. A user has the following attributes:
+
 | Name | Type | Description |
 |:---|:---|:---|
 | `id` | UUID | |
