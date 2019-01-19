@@ -4,7 +4,7 @@ The User data type will be transformed and returned as the value of the `content
 
 ## User Resource
 
-```json
+```json5
 {
   "id": "",
   "name": "",
@@ -22,7 +22,7 @@ The User data type will be transformed and returned as the value of the `content
 
 ## User Tasks Link Response
 
-```json
+```json5
 {
   "total": 0,
   "tasks": [
@@ -36,7 +36,7 @@ The User data type will be transformed and returned as the value of the `content
 
 ## User Goals Link Response
 
-```json
+```json5
 {
   "total": 0,
   "goals": [
@@ -50,7 +50,7 @@ The User data type will be transformed and returned as the value of the `content
 
 ## User Objectives Link Response
 
-```json
+```json5
 {
   "total": 0,
   "objectives": [

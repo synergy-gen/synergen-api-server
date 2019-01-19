@@ -3,7 +3,7 @@
 The Group data type will be transformed and returned as the value of the `content` JSON property as follows:
 
 ## Group Resource
-```json
+```json5
 {
     "id": "",
     "name": "",
@@ -23,7 +23,7 @@ The Group data type will be transformed and returned as the value of the `conten
 ```
 
 ## Group Members Link Response
-```json
+```json5
 {
     "total": 0,
     "members": [
@@ -41,7 +41,7 @@ The Group data type will be transformed and returned as the value of the `conten
 
 ## Group Goals Link Response
 
-```json
+```json5
 {
   "total": 0,
   "goals": [
@@ -55,7 +55,7 @@ The Group data type will be transformed and returned as the value of the `conten
 
 ## Group Objectives Link Response
 
-```json
+```json5
 {
   "total": 0,
   "objectives": [

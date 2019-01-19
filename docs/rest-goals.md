@@ -4,7 +4,7 @@ The Goal data type will be transformed and returned as the value of the `content
 
 ## Goal Resource
 
-```json
+```json5
 {
   "id": "",
   "title": "",
@@ -20,7 +20,7 @@ The Goal data type will be transformed and returned as the value of the `content
 
 ## Goal Tasks Link Response
 
-```json
+```json5
 {
   "total": 0,
   "tasks": [

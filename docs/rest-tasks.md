@@ -4,7 +4,7 @@ The Task data type will be transformed and returned as the value of the `content
 
 ## Task Resource
 
-```json
+```json5
 {
   "id": "",
   "title": "",

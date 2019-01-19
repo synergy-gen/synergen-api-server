@@ -4,7 +4,7 @@ The Objectives data type will be transformed and returned as the value of the `c
 
 ## Objectives Resource
 
-```json
+```json5
 {
   "id": "",
   "title": "",
@@ -20,7 +20,7 @@ The Objectives data type will be transformed and returned as the value of the `c
 
 ## Objective Goals Link Response
 
-```json
+```json5
 {
   "total": 0,
   "goals": [

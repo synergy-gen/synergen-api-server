@@ -15,9 +15,9 @@ We don't want to just dump data directly from out database onto our users. This 
 ### REST Response Format
 In addition to the formats specified above, EVERY response will be returned from the api server in the following format:
 
-```json
+```json5
 {
-    "api": "<version>", /* The version of the API that responded to the request */
+    "api": "<version>", // The version of the API that responded to the request
     "success": true,    // Whether the request was successful (for convenience)
     "status": "",       // The string HTTP status type (for convenience)
     "message": "",      // A message from the server
@@ -27,7 +27,7 @@ In addition to the formats specified above, EVERY response will be returned from
 
 In the content body there will always be at least one JSON property with the key`"_links"`. These properties contain API endpoints for additional information about the resource. One link to be aware is the `self` link. The `self` link points to the parent resource object. For example, if the response content is structured as follows:
 
-```json
+```json5
 {
     "foo": {
         "bar": {
