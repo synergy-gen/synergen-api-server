@@ -1,0 +1,24 @@
+# This file is meant to serve as a template for other configuration files and also defines the default values for
+# configuration for the PlayBook service. See (https://github.com/lorenwest/node-config/wiki/Configuration-Files) for
+# more details on how the Node.js 'config' library works with these files.
+
+# Default database configuration
+database:
+    host: localhost
+    port: 27017
+    name: synergen
+
+# Default server configurations
+server:
+    host: localhost
+    port: 8585
+
+# Default security configurations. These are mainly used to assist with creation/verification of JSON Web Tokens
+# to authenticate requests
+security:
+    hashAlgo: sha256
+    jwt:
+        audience: synergen.com/api
+        issuer: synergen.com
+        secretKey: /etc/secrets/private.key
+

@@ -1,0 +1,2 @@
+# Secrets Directory
+No files placed in this directory will be checked into source control (except for this README.md). This is where secret/private keys and other sensitive information could be placed for the rest of the application to use.
