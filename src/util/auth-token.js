@@ -32,7 +32,7 @@ function createPassportStrategy(cb) {
     }
 }
 
-function _generateStrategy(audience) {
+function _generateStrategy() {
     return new Strategy(
         {
             jwtFromRequest: function(req) {
@@ -43,7 +43,7 @@ function _generateStrategy(audience) {
                 return token;
             },
             issuer: _issuer,
-            audience,
+            audience: _audience,
             secretOrKey: _secret
         },
         (payload, done) => {
@@ -57,12 +57,12 @@ function generate(subject) {
     let payload = {
         iss: _issuer,
         sub: subject,
-        aud: audience || [],
+        aud: _audience,
         exp: Math.floor(Date.now() / 1000) + 60 * 60
     };
     return new Promise((resolve, reject) => {
         if (!_secret) {
-            _retrieveSecret((err) => {
+            _retrieveSecret(err => {
                 if (err) return reject(err);
                 jwt.sign(payload, _secret, (err, token) => {
                     if (err) return reject(err);
@@ -78,20 +78,27 @@ function generate(subject) {
     });
 }
 
-function verify(token, subject, audience) {
+function verify(token, subject) {
+    let options = { subject, audience: _audience, issuer: _issuer };
     return new Promise((resolve, reject) => {
-        fs.readFile(_key, 'utf8', (err, secret) => {
-            if (err)
-                return reject(new SynergenError(ErrorCodes.F_FILE_FAILURE, `Failed to read secret: ${err.message}`));
-            let options = { subject, audience, issuer: _issuer };
-            jwt.verify(token, secret, options, (err, decoded) => {
-                if (err)
-                    return reject(
-                        new SynergenError(ErrorCodes.A_AUTH_TOKEN_FAILURE, `Failed to validate token: ${err.message}`)
-                    );
-                return resolve(decoded);
+        if (!_secret) {
+            _retrieveSecret(err => {
+                if (err) return reject(err);
+                _verifyToken(token, options, resolve, reject);
             });
-        });
+        } else {
+            _verifyToken(token, options, resolve, reject);
+        }
+    });
+}
+
+function _verifyToken(token, options, resolve, reject) {
+    jwt.verify(token, _secret, options, (err, decoded) => {
+        if (err)
+            return reject(
+                new SynergenError(ErrorCodes.A_AUTH_TOKEN_FAILURE, `Failed to validate token: ${err.message}`)
+            );
+        return resolve(decoded);
     });
 }
 

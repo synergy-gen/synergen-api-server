@@ -25,12 +25,21 @@ async function login(req, res) {
         if (!req.body.username || !req.body.password)
             return response.sendErrorResponse(res, status.BAD_REQUEST, 'Missing username and/or password');
         let user = await UserModel.find({ username: req.body.username });
-        if (!user) return response.sendErrorResponse(res, status.NOT_FOUND, 'Could not find user with username');
+        if (!user)
+            return response.sendErrorResponse(
+                res,
+                status.NOT_FOUND,
+                `Could not find user with username '${req.body.username}'`
+            );
         let authInfo = await AuthModel.find({ user: user.id });
         if (!authInfo) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to authenticate user');
         let hashed = hash(authInfo.algo, authInfo.salt, req.body.password);
         if (hashed != authInfo.hash) {
-            return response.sendErrorResponse(res, status.BAD_REQUEST, 'Incorrect password');
+            return response.sendErrorResponse(
+                res,
+                status.BAD_REQUEST,
+                `Incorrect password for user '${req.body.username}'`
+            );
         }
         // Authentication succeeded, generate a token and return it to the user
         let token = await authToken.generate(req.body.username);

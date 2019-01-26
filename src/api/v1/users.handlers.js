@@ -41,7 +41,9 @@ async function addNewUser(req, res) {
             return response.sendActionResponse(res, status.OK, 'User already exists', user);
         }
         logger.trace('Adding new user with username ' + req.body.username);
-        user = await UserModel.merge(new UserModel.User(req.body));
+        user = new UserModel.User(req.body);
+        user.lastLogin = Date.now();
+        user = await UserModel.merge(user);
         logger.trace('Added user. Generating authentication entry');
         let salt = crypto.randomBytes(8).toString('hex');
         let algo = _config.hashAlgo;

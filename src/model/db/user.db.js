@@ -6,7 +6,7 @@ const User = new mongoose.Schema(
         username: { type: String, required: true },
         name: { type: String, required: true },
         email: { type: String, required: true },
-        last_login: { type: Number, required: true, default: Date.now() }
+        lastLogin: { type: Number, required: true, default: Date.now() }
     },
     { strict: 'throw' }
 );

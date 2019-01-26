@@ -9,7 +9,7 @@ class User {
         this.username = props.username;
         this.name = props.name;
         this.email = props.email;
-        this.lastLogin = props.lastLogin || props.last_login;
+        this.lastLogin = props.lastLogin;
     }
 }
 

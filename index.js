@@ -4,6 +4,7 @@ const api = require('./src/api/v1/routes');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const logger = require('winstonson')(module);
+logger.setDateFormat('YYYY-MM-DD HH:MM:ss.SSS');
 
 const serverConfig = config.get('server');
 const databaseConfig = config.get('database');
@@ -23,7 +24,14 @@ db.once('open', () => {
     const app = express();
 
     // Add trace logging on HTTP requests with Morgan
-    app.use(morgan('tiny', { stream: logger.stream('trace') }));
+    app.use(morgan('---> :remote-addr :remote-user :method :url HTTP/:http-version', {
+        immediate: true,
+        stream: logger.stream('trace')
+    }));
+    app.use(morgan('<--- :method :url :status :res[content-length]', {
+        immediate: false,
+        stream: logger.stream('trace')
+    }));
 
     app.use(api);
 
