@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const TaskSchema = require('./task.db').schema;
+const GoalSchema = require('./goal.db').schema;
 
 const User = new mongoose.Schema(
     {
@@ -6,7 +8,17 @@ const User = new mongoose.Schema(
         username: { type: String, required: true },
         name: { type: String, required: true },
         email: { type: String, required: true },
-        lastLogin: { type: Number, required: true, default: Date.now() }
+        lastLogin: { type: Number, required: true, default: Date.now() },
+        tasks: {
+            type: Array,
+            of: TaskSchema,
+            default: []
+        },
+        goals: {
+            type: Array,
+            of: GoalSchema,
+            default: []
+        }
     },
     { strict: 'throw' }
 );

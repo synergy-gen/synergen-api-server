@@ -2,23 +2,14 @@ const AuthModel = require('../../model/auth.model');
 const UserModel = require('../../model/user.model');
 const response = require('./response');
 const status = require('http-status');
-const crypto = require('crypto');
 const logger = require('winstonson')(module);
-const authToken = require('../../util/auth-token');
+const security = require('../../util/security');
+const userHandlers = require('./users.handlers');
 
 module.exports = {
     verifyAuthorized,
-    login,
-    hash
+    login
 };
-
-function hash(algo, salt, password) {
-    return crypto
-        .createHash(algo)
-        .update(salt)
-        .update(password)
-        .digest('hex');
-}
 
 async function login(req, res) {
     try {
@@ -33,7 +24,7 @@ async function login(req, res) {
             );
         let authInfo = await AuthModel.find({ user: user.id });
         if (!authInfo) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to authenticate user');
-        let hashed = hash(authInfo.algo, authInfo.salt, req.body.password);
+        let hashed = security.hash(authInfo.algo, authInfo.salt, req.body.password);
         if (hashed != authInfo.hash) {
             return response.sendErrorResponse(
                 res,
@@ -42,9 +33,12 @@ async function login(req, res) {
             );
         }
         // Authentication succeeded, generate a token and return it to the user
-        let token = await authToken.generate(req.body.username);
+        let token = await security.generateToken(req.body.username);
         res.cookie('auth', token);
-        return response.sendActionResponse(res, status.OK, 'Successfully authenticated user', { token });
+        let userBody = userHandlers.generateUserResponse(user);
+        return response.sendActionResponse(res, status.OK, 'Successfully authenticated user', {
+            user: userBody
+        });
     } catch (err) {
         logger.error(err);
         return response.sendErrorResponse(res, err, 'authenticate user');

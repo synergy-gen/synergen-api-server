@@ -3,11 +3,11 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const apiRouter = express.Router();
 const passport = require('passport');
-const authToken = require('../../util/auth-token');
+const security = require('../../util/security');
 const users = require('./users.routes');
 const auth = require('./auth.routes');
 
-authToken.createPassportStrategy((err, strategy) => {
+security.createPassportStrategy((err, strategy) => {
     if (err) throw new Error('Failed to create passport strategy: ' + err.message);
     passport.use(strategy);
     apiRouter.use(bodyParser.json());

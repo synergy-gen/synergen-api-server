@@ -1,6 +1,8 @@
 const db = require('./db/user.db');
 const errors = require('../util/error');
 const shortid = require('shortid');
+const { Task } = require('./task.model');
+const { Goal } = require('./goal.model');
 
 class User {
     constructor(props) {
@@ -10,6 +12,14 @@ class User {
         this.name = props.name;
         this.email = props.email;
         this.lastLogin = props.lastLogin;
+        this.tasks = props.tasks || [];
+        if (this.tasks.length > 0 && !(this.tasks[0] instanceof Task)) {
+            this.tasks = this.tasks.map(t => new Task(t));
+        }
+        this.goals = props.goals || [];
+        if(this.goals.length > 0 && !(this.goals[0] instanceof Goal)) {
+            this.goals = this.goals.map(g => new Goal(g));
+        }
     }
 }
 
@@ -32,7 +42,7 @@ function find(query) {
     if (query && query.id) {
         q._id = query.id;
     }
-    if(query && query.username) {
+    if (query && query.username) {
         q.username = query.username;
     }
     return new Promise((resolve, reject) => {

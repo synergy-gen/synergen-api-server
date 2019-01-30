@@ -4,6 +4,7 @@ const config = require('config');
 const path = require('path');
 const { SynergenError, ErrorCodes } = require('./error');
 const { Strategy } = require('passport-jwt');
+const crypto = require('crypto');
 
 let _config = config.get('security');
 let _key = path.join(process.cwd(), _config.jwt.secretKey);
@@ -53,7 +54,7 @@ function _generateStrategy() {
     );
 }
 
-function generate(subject) {
+function generateToken(subject) {
     let payload = {
         iss: _issuer,
         sub: subject,
@@ -78,7 +79,7 @@ function generate(subject) {
     });
 }
 
-function verify(token, subject) {
+function verifyToken(token, subject) {
     let options = { subject, audience: _audience, issuer: _issuer };
     return new Promise((resolve, reject) => {
         if (!_secret) {
@@ -102,8 +103,17 @@ function _verifyToken(token, options, resolve, reject) {
     });
 }
 
+function hash(algo, salt, password) {
+    return crypto
+        .createHash(algo)
+        .update(salt)
+        .update(password)
+        .digest('hex');
+}
+
 module.exports = {
-    generate,
-    verify,
-    createPassportStrategy
+    generateToken,
+    verifyToken,
+    createPassportStrategy,
+    hash
 };
