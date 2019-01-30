@@ -36,7 +36,7 @@ async function login(req, res) {
         let token = await security.generateToken(req.body.username);
         res.cookie('auth', token);
         let userBody = userHandlers.generateUserResponse(user);
-        return response.sendActionResponse(res, status.OK, 'Successfully authenticated user', {
+        return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', {
             user: userBody
         });
     } catch (err) {
@@ -48,5 +48,5 @@ async function login(req, res) {
 async function verifyAuthorized(req, res) {
     // We should not get to this point unless the request came with a valid authorization token. Just return
     // success
-    return response.sendQueryResponse(res, status.OK, { message: 'Token still valid' });
+    return response.sendOkResponse(res, status.OK, 'Token still valid', {});
 }

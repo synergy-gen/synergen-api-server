@@ -1,52 +1,54 @@
 const httpStatus = require('http-status');
 const { ErrorCodes } = require('../../util/error');
+const apiVersion = 'v1';
 
-function sendQueryResponse(res, status, data) {
-    res.status(status).json(data || {});
-}
-
-function sendActionResponse(res, status, message, content) {
+function sendOkResponse(res, status, message, content = {}) {
     res.status(status).json({
+        api: apiVersion,
+        succuess: true,
+        status: status,
         timestamp: Date.now(),
-        message: `${message}`,
-        content: content || {}
+        message,
+        content
     });
 }
 
 function sendErrorResponse(res, err, actionOrMessage) {
+    let response = {
+        api: apiVersion,
+        success: false,
+        status: 0,
+        timestamp: Date.now(),
+        content: {},
+        message: ''
+    };
     if (typeof err === 'number') {
-        return res.status(err).json({
-            timestamp: Date.now(),
-            message: actionOrMessage
-        });
+        response.message = actionOrMessage;
+        response.status = err;
+        return res.status(response.status).json(response);
     } else {
         switch (err.code) {
             case ErrorCodes.M_INVALID_FORMAT:
-                return res.status(httpStatus.BAD_REQUEST).json({
-                    timestamp: Date.now(),
-                    message: `Failed to ${actionOrMessage}: improperly formatted request`
-                });
+                response.status = httpStatus.BAD_REQUEST;
+                response.message = `Failed to ${actionOrMessage}: improperly formatted request`;
+                return res.status(response.status).json(response);
             case ErrorCodes.A_AUTH_TOKEN_FAILURE:
-                return res.status(httpStatus.UNAUTHORIZED).json({
-                    timestamp: Date.now(),
-                    message: `Failed to ${actionOrMessage}: invalid token`
-                });
+                response.status = httpStatus.UNAUTHORIZED;
+                response.message = `Failed to ${actionOrMessage}: invalid token`;
+                return res.status(response.status).json(response);
             case ErrorCodes.F_FILE_FAILURE:
-                return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-                    timestamp: Date.now(),
-                    message: `Failed to ${actionOrMessage}: file failure`
-                });
+                response.status = httpStatus.INTERNAL_SERVER_ERROR;
+                response.message = `Failed to ${actionOrMessage}: file failure`;
+                return res.status(response.status).json(response);
             default:
-                return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-                    timestamp: Date.now(),
-                    message: `Failed to ${actionOrMessage}`
-                });
+                response.status = httpStatus.INTERNAL_SERVER_ERROR;
+                response.message = `Failed to ${actionOrMessage}`;
+                return res.status(response.status).json(response);
         }
     }
 }
 
 module.exports = {
-    sendQueryResponse,
-    sendActionResponse,
+    sendOkResponse,
     sendErrorResponse
 };

@@ -56,7 +56,7 @@ async function addNewUser(req, res) {
         logger.trace('Verifying user does not already exist');
         let user = await UserModel.find({ username: req.body.username });
         if (user !== undefined) {
-            return response.sendActionResponse(res, status.OK, 'User already exists', user);
+            return response.sendOkResponse(res, status.OK, 'User already exists', user);
         }
         logger.trace('Adding new user with username ' + req.body.username);
         user = new UserModel.User(req.body);
@@ -69,7 +69,7 @@ async function addNewUser(req, res) {
         await AuthModel.merge(new AuthModel.AuthInfo({ user: user.id, salt, algo, hash: h }));
         logger.trace('Authentication entry added. Preparing response');
         let resBody = generateUserResponse(user);
-        return response.sendActionResponse(res, status.CREATED, 'Successfully created new user', resBody);
+        return response.sendOkResponse(res, status.CREATED, 'Successfully created new user', resBody);
     } catch (err) {
         logger.error(err);
         return response.sendErrorResponse(res, err, 'add new user');
@@ -81,7 +81,7 @@ async function getUser(req, res) {
         logger.trace('Retrieving user');
         let user = await UserModel.find({ id: req.params.id });
         let resBody = generateUserResponse(user);
-        return response.sendQueryResponse(res, status.OK, resBody);
+        return response.sendOkResponse(res, status.OK, 'Successfully retrieved user information', resBody);
     } catch (err) {
         logger.error(err);
         return response.sendErrorResponse(res, err, 'retrieve user');
@@ -95,7 +95,7 @@ async function updateUser(req, res) {
         let updatedUser = await UserModel.merge(req.body);
         logger.trace('User updated. Preparing and sending response');
         let resBody = generateUserResponse(updatedUser);
-        return response.sendActionResponse(res, status.OK, 'Successfully saved user', resBody);
+        return response.sendOkResponse(res, status.OK, 'Successfully saved user', resBody);
     } catch (err) {
         return response.sendErrorResponse(res, err, 'save user');
     }
@@ -107,10 +107,10 @@ async function deleteUser(req, res) {
         let removed = await UserModel.remove({ id: req.params.id });
         if (!removed) {
             logger.warn('Failed to remove user: could not find user with id ' + req.params.id);
-            return response.sendActionResponse(res, status.NOT_FOUND, 'Failed to find user to remove');
+            return response.sendOkResponse(res, status.NOT_FOUND, 'Failed to find user to remove');
         }
         logger.trace('Removed user');
-        return response.sendActionResponse(res, status.OK, 'Successfully removed user');
+        return response.sendOkResponse(res, status.OK, 'Successfully removed user');
     } catch (err) {
         logger.error(err);
         return response.sendErrorResponse(res, err, 'remove user');

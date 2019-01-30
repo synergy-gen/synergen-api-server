@@ -20,6 +20,7 @@ In addition to the formats specified above, EVERY response will be returned from
     "api": "<version>", // The version of the API that responded to the request
     "success": true,    // Whether the request was successful (for convenience)
     "status": "",       // The string HTTP status type (for convenience)
+    "timestamp": 0,     // The time of the completed request
     "message": "",      // A message from the server
     "content": {}       // The response content, determined by the RESTful objects defined above
 }
