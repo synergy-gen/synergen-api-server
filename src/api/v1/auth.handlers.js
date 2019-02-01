@@ -48,5 +48,16 @@ async function login(req, res) {
 async function verifyAuthorized(req, res) {
     // We should not get to this point unless the request came with a valid authorization token. Just return
     // success
-    return response.sendOkResponse(res, status.OK, 'Token still valid', {});
+    try {
+        let user = await UserModel.find({ username: req.user.sub });
+        let body = userHandlers.generateUserResponse(user);
+        return response.sendOkResponse(res, status.OK, 'Token still valid', { user: body });
+    } catch (err) {
+        logger.error(err);
+        return response.sendErrorResponse(
+            res,
+            status.INTERNAL_SERVER_ERROR,
+            'Could not verify if user is authenticated'
+        );
+    }
 }
