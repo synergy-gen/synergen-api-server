@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "debug": "node --inspect index.js"
+    "debug": "node --inspect index.js",
+    "seed": "node etc/seeds/seed.js"
   },
   "author": "",
   "license": "Apache-2.0",
