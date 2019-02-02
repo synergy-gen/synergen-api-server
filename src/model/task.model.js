@@ -3,19 +3,27 @@ const shortid = require('shortid');
 const errors = require('../util/error');
 
 class Task {
-    constructor(props) {
+    constructor(props = {}) {
         this.id = props.id || props._id || shortid.generate();
-        this.title = props.title || null;
         this.details = props.details || null;
         this.type = props.type || Task.Types.CHECK;
         this.complete = props.complete || false;
+        this.repeated = props.repeated || Task.Repeat.NO;
         this.data = props.data || null;
+        this.createDate = props.createDate || Date.now();
     }
 }
 
 Task.Types = {
     CHECK: 'check'
-}
+};
+
+Task.Repeat = {
+    NO: 'no',
+    DAILY: 'daily',
+    WEEKLY: 'weekly',
+    MONTHLY: 'monthly'
+};
 
 function merge(task) {
     return new Promise((resolve, reject) => {

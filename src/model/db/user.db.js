@@ -18,7 +18,9 @@ const User = new mongoose.Schema(
             type: Array,
             of: GoalSchema,
             default: []
-        }
+        },
+        // TODO: add objectives
+        createDate: { type: Number, required: true }
     },
     { strict: 'throw' }
 );

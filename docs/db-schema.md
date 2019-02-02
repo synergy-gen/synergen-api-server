@@ -18,10 +18,11 @@ A user is any person using the system. A user has the following attributes:
 | `name` | string | the name of the user |
 | `username` | string | the username defined by the user that can uniquely identify this user. Mutable. |
 | `email` | string | the email address of the user |
-| `last_login` | UNIX timestamp | a record of the last time the user accessed the service |
+| `lastLogin` | UNIX timestamp | a record of the last time the user accessed the service |
 | `tasks` | Task[] | an array of task objects private to the user. Includes adopted goals. |
 | `goals` | Goal[] | an array of goals private to the user. Includes adopted goals. |
 | `objectives` | Objective[] | an array of objectives private to the user. Includes adopted goals. |
+| `createDate` | the date when the user was created |
 
 ## Task
 
@@ -30,11 +31,12 @@ A task is the smallest unit of data in the Synergen service. It has the followin
 | Name | Type | Description |
 |:---|:---|:---|
 | `id` | UUID | |
-| `title` | string | the title of the task |
 | `details` | string | the details of the task |
 | `type` | string | the type of task (defaults to `check`) |
-| `complete` | boolean | flag to indicate if the task has been marked as done |
+| `complete` | boolean | flag to indicate if the task has been marked as done or when the task has been deleted |
+| `repeated` | string | determines if and how the task should be tracked for statistics |
 | `data` | *depends* | additional data associated with the task, determined by the `type` |
+| `createDate` | number | the date when the task was created |
 
 ## Goal
 
@@ -48,6 +50,8 @@ A goal is essentially a collection of tasks. Goals are associated either publica
 | `tasks` | Task[] | a list of tasks associated with the goal |
 | `creator` | UUID | the id of the user who created the goal (useful for public goals and tracking adoptions) |
 | `adoptions` | number | the number of times the goal has been adopted |
+| `tags` | string[] | tags that can be searched when users are looking for goals |
+| `createDate` | number | the date and time when the goal was created |
 
 ## Objective
 
@@ -61,6 +65,8 @@ Objectives are collections of goals and are the highlest level of organization i
 | `goals` | Goal[] | a list of goals associated with the objective |
 | `creator` | UUID | the id of the user who created the objective (useful for public objectives and tracking adoptions) |
 | `adoptions` | number | the number of times the objective has been adopted |
+| `tags` | string[] | tags that can be searched when users are looking for groups |
+| `createDate` | number | the date and time when the objective was created |
 
 ## Group
 
@@ -76,4 +82,5 @@ Groups are collections of users. They are currently always public from the momen
 | `creator` | UUID | the id of the user who created the group |
 | `members` | UUID[] | a list of the ids of users belonging to the group |
 | `owners` | UUID[] | a list of group members who have special privileges within the group |
-| `create_date` | UNIX timestamp | the date the group was created |
+| `createDate` | UNIX timestamp | the date the group was created |
+| `tags` | string[] | tags that can be searched when users are looking for groups |

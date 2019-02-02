@@ -3,13 +3,15 @@ const db = require('./db/goal.db');
 const errors = require('../util/error');
 
 class Goal {
-    constructor(props) {
+    constructor(props = {}) {
         this.id = props.id || props._id || shortid.generate();
         this.title = props.title || null;
         this.description = props.description || null;
         this.tasks = props.tasks || [];
         this.creator = props.creator || null;
         this.adoptions = props.adoptions || 0;
+        this.tags = props.tags || [];
+        this.createDate = props.createDate || Date.now();
     }
 }
 

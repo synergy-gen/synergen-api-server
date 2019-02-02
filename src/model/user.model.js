@@ -20,6 +20,8 @@ class User {
         if(this.goals.length > 0 && !(this.goals[0] instanceof Goal)) {
             this.goals = this.goals.map(g => new Goal(g));
         }
+        // TODO: add objectives to user model
+        this.createDate = props.createDate || Date.now();
     }
 }
 
