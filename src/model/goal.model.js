@@ -1,6 +1,7 @@
 const shortid = require('shortid');
 const db = require('./db/goal.db');
 const errors = require('../util/error');
+const { Task } = require('./task.model');
 
 class Goal {
     constructor(props = {}) {
@@ -8,6 +9,9 @@ class Goal {
         this.title = props.title || null;
         this.description = props.description || null;
         this.tasks = props.tasks || [];
+        if(this.tasks.length > 0 && !(this.tasks[0] instanceof Task)){
+            this.tasks = this.tasks.map(t => new Task(t));
+        }
         this.creator = props.creator || null;
         this.adoptions = props.adoptions || 0;
         this.tags = props.tags || [];

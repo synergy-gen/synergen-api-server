@@ -12,10 +12,6 @@ class User {
         this.name = props.name;
         this.email = props.email;
         this.lastLogin = props.lastLogin;
-        this.tasks = props.tasks || [];
-        if (this.tasks.length > 0 && !(this.tasks[0] instanceof Task)) {
-            this.tasks = this.tasks.map(t => new Task(t));
-        }
         this.goals = props.goals || [];
         if(this.goals.length > 0 && !(this.goals[0] instanceof Goal)) {
             this.goals = this.goals.map(g => new Goal(g));
@@ -81,9 +77,31 @@ function remove(query) {
     });
 }
 
+function addGoalToUser(id, goal) {
+    return new Promise((resolve, reject) => {
+        db.findOneAndUpdate({_id: id}, {$push: { goals: {...goal}}}, {new: true}).lean().exec((err, doc) => {
+            if(err) return reject(errors.translate(err, 'add goal to usre'));
+            if(!doc) return resolve(undefined);
+            return resolve(new User(doc));
+        });
+    });
+}
+
+function removeGoalFromUser(userId, goalId) {
+    return new Promise((resolve, reject) => {
+        db.deleteOne({_id: userId}, { $pull: { goals: { $in: [goalId]}}}).lean().exec((err, res) => {
+            if(err) return reject(errors.translate(err, 'remove goal from user'));
+            if(result && result.n === 0) return resolve(false);
+            return resolve(true);
+        })
+    });
+}
+
 module.exports = {
     User,
     merge,
     find,
-    remove
+    remove,
+    addGoalToUser,
+    removeGoalFromUser
 };

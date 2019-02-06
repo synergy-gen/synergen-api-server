@@ -34,7 +34,8 @@ async function login(req, res) {
         }
         // Authentication succeeded, generate a token and return it to the user
         let token = await security.generateToken(req.body.username);
-        res.cookie('auth', token);
+        // Setting 'httpOnly' to false allows the client to delete the cookie
+        res.cookie('auth', token, { httpOnly: false });
         let userBody = userHandlers.generateUserResponse(user);
         return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', {
             user: userBody

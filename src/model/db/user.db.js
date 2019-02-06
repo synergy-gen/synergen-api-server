@@ -9,11 +9,6 @@ const User = new mongoose.Schema(
         name: { type: String, required: true },
         email: { type: String, required: true },
         lastLogin: { type: Number, required: true, default: Date.now() },
-        tasks: {
-            type: Array,
-            of: TaskSchema,
-            default: []
-        },
         goals: {
             type: Array,
             of: GoalSchema,
