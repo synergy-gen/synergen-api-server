@@ -3,6 +3,7 @@ const errors = require('../util/error');
 const shortid = require('shortid');
 const { Task } = require('./task.model');
 const { Goal } = require('./goal.model');
+const logger = require('winstonson')(module);
 
 class User {
     constructor(props) {
@@ -80,7 +81,7 @@ function remove(query) {
 function addGoalToUser(id, goal) {
     return new Promise((resolve, reject) => {
         db.findOneAndUpdate({_id: id}, {$push: { goals: {...goal}}}, {new: true}).lean().exec((err, doc) => {
-            if(err) return reject(errors.translate(err, 'add goal to usre'));
+            if(err) return reject(errors.translate(err, 'add goal to user'));
             if(!doc) return resolve(undefined);
             return resolve(new User(doc));
         });

@@ -111,11 +111,11 @@ const self = (module.exports = {
     addGoalToUser: async (req, res) => {
         try {
             let goal = new Goal(req.body);
-            let user = await UserModel.addGoalToUser(req.param.id, goal);
+            let user = await UserModel.addGoalToUser(req.params.id, goal);
             if (!user) {
                 return response.sendErrorResponse(res, status.BAD_REQUEST, 'Failed to add new goal to user');
             }
-            let body = generateUserResponse(user);
+            let body = self.generateUserResponse(user);
             return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);
         } catch (err) {
             logger.error(err);

@@ -8,5 +8,6 @@ usersRouter.post('/users', handlers.addNewUser);
 usersRouter.get('/users/:id', passport.authenticate('jwt', { session: false }), handlers.getUser);
 usersRouter.patch('/users/:id', passport.authenticate('jwt', { session: false }), handlers.updateUser);
 usersRouter.delete('/users/:id', passport.authenticate('jwt', { session: false }), handlers.deleteUser);
+usersRouter.post('/users/:id/goals', passport.authenticate('jwt', { session: false }), handlers.addGoalToUser);
 
 module.exports = usersRouter;
