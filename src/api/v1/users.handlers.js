@@ -22,16 +22,20 @@ const self = (module.exports = {
             goals: self + '/goals',
             objectives: self + '/objectives'
         };
-        u.goals = u.goals.map(g => ({
-            ...g,
-            tasks: g.tasks.map(t => ({
-                ...t,
-                _links: `${self}/goals/${g.id}/tasks/${t.id}`
-            })),
-            _links: {
-                self: `${self}/goals/${g.id}`
-            }
-        }));
+        let goals = {};
+        user.goals.forEach(g => {
+            goals[g.id] = {
+                ...g,
+                tasks: g.tasks.map(t => ({
+                    ...t,
+                    _links: `${self}/goals/${g.id}/tasks/${t.id}`
+                })),
+                _links: {
+                    self: `${self}/goals/${g.id}`
+                }
+            };
+        });
+        u.goals = goals;
         return u;
     },
 
