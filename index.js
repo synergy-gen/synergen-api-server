@@ -8,8 +8,8 @@ logger.setDateFormat('YYYY-MM-DD HH:MM:ss.SSS');
 
 const serverConfig = config.get('server');
 const databaseConfig = config.get('database');
-
-const mongoUrl = `mongodb://${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.name}`;
+const userPass = databaseConfig.get('user') ? databaseConfig.get('user') + ':' + databaseConfig.get('pass') + '@' : '';
+const mongoUrl = `mongodb://${userPass}${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.name}`;
 
 process.title = 'synergen-api-server';
 
@@ -20,7 +20,7 @@ mongoose.connect(
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-    console.log(`Connected to Mongo at ${mongoUrl}`);
+    console.log(`Connected to Mongo at ${databaseConfig.host}:${databaseConfig.port}`);
     const app = express();
 
     // Add trace logging on HTTP requests with Morgan
