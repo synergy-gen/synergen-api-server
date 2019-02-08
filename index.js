@@ -8,7 +8,12 @@ logger.setDateFormat('YYYY-MM-DD HH:MM:ss.SSS');
 
 const serverConfig = config.get('server');
 const databaseConfig = config.get('database');
-const userPass = databaseConfig.get('user') ? databaseConfig.get('user') + ':' + databaseConfig.get('pass') + '@' : '';
+let userPass = '';
+try {
+    userPass = databaseConfig.get('user') + ':' + databaseConfig.get('pass') + '@';
+} catch(err) {
+    console.log('No user/password for MongoDB specified. No authentication parameters will be provided in connection');
+}
 const mongoUrl = `mongodb://${userPass}${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.name}`;
 
 process.title = 'synergen-api-server';
