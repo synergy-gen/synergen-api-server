@@ -11,53 +11,19 @@ The User data type will be transformed and returned as the value of the `content
   "username": "",
   "email": "",
   "lastLogin": "",
+  "goals": [
+    // An array of goal objects (see accompanying rest-goals.md file)
+  ],
+  "objectives": [
+    // An array of objective objects (see accompanying rest-objectives.md file)
+  ],
+  "createDate": 0,
+  "updateDate": 0,
+  "active": false,
   "_links": {
     "self": "",
-    "tasks": "",
     "goals": "",
     "objectives": ""
-  }
-}
-```
-
-## User Tasks Link Response
-
-```json5
-{
-  "total": 0,
-  "tasks": [
-    // Array of RESTful task objects
-  ],
-  "_links": {
-    "self": ""
-  }
-}
-```
-
-## User Goals Link Response
-
-```json5
-{
-  "total": 0,
-  "goals": [
-    // Array of RESTful goal objects
-  ],
-  "_links": {
-    "self": ""
-  }
-}
-```
-
-## User Objectives Link Response
-
-```json5
-{
-  "total": 0,
-  "objectives": [
-    // Array of RESTful objective objects
-  ],
-  "_links": {
-    "self": ""
   }
 }
 ```

@@ -19,10 +19,11 @@ A user is any person using the system. A user has the following attributes:
 | `username` | string | the username defined by the user that can uniquely identify this user. Mutable. |
 | `email` | string | the email address of the user |
 | `lastLogin` | UNIX timestamp | a record of the last time the user accessed the service |
-| `tasks` | Task[] | an array of task objects private to the user. Includes adopted goals. |
 | `goals` | Goal[] | an array of goals private to the user. Includes adopted goals. |
 | `objectives` | Objective[] | an array of objectives private to the user. Includes adopted goals. |
-| `createDate` | the date when the user was created |
+| `createDate` | number |the date when the user was created |
+| `updateDate` | number| the date and time when the user's profile was last updated |
+| `active` | boolean | flag to confirm whether the user's email has been verified |
 
 ## Task
 
@@ -33,10 +34,9 @@ A task is the smallest unit of data in the Synergen service. It has the followin
 | `id` | UUID | |
 | `details` | string | the details of the task |
 | `type` | string | the type of task (defaults to `check`) |
-| `complete` | boolean | flag to indicate if the task has been marked as done or when the task has been deleted |
-| `repeated` | string | determines if and how the task should be tracked for statistics |
 | `data` | *depends* | additional data associated with the task, determined by the `type` |
 | `createDate` | number | the date when the task was created |
+| `updateDate` | number | the date and time when the task was updated |
 
 ## Goal
 
@@ -49,9 +49,13 @@ A goal is essentially a collection of tasks. Goals are associated either publica
 | `description` | string | a brief description of the goal |
 | `tasks` | Task[] | a list of tasks associated with the goal |
 | `creator` | UUID | the id of the user who created the goal (useful for public goals and tracking adoptions) |
-| `adoptions` | number | the number of times the goal has been adopted |
+| `public` | boolean | flag to determine whether the goals has been published or not |
+| `parent` | UUID | the id of the public goal this goal was adopted from. Helpful for tracking stats and other followers. |
+| `adoptions` | UUID[] | an array of all the user ids of users who have adopted the goal |
 | `tags` | string[] | tags that can be searched when users are looking for goals |
 | `createDate` | number | the date and time when the goal was created |
+| `targetDate` | number | the date (and time) when the goal should be accomplished (set per user or group) |
+| `updateDate` | number | the date and time when the goal was updated |
 
 ## Objective
 
@@ -64,9 +68,13 @@ Objectives are collections of goals and are the highlest level of organization i
 | `description` | string | a brief description of the objective |
 | `goals` | Goal[] | a list of goals associated with the objective |
 | `creator` | UUID | the id of the user who created the objective (useful for public objectives and tracking adoptions) |
-| `adoptions` | number | the number of times the objective has been adopted |
-| `tags` | string[] | tags that can be searched when users are looking for groups |
+| `public` | boolean | flag to determine whether the objective has been published or not |
+| `parent` | UUID | the id of the public objective from which this objecive was adopted |
+| `adoptions` | UUID[] | and array of user ids of users who have adopted the objective. Helpful for tracking stats. |
+| `tags` | string[] | tags that can be searched when users are looking for objectives |
 | `createDate` | number | the date and time when the objective was created |
+| `targetDate` | number | the date (and time) when the objective should be accomplished (set per user or group) |
+| `updateDate` | number | the date and time when the objective was updated |
 
 ## Group
 
@@ -82,5 +90,6 @@ Groups are collections of users. They are currently always public from the momen
 | `creator` | UUID | the id of the user who created the group |
 | `members` | UUID[] | a list of the ids of users belonging to the group |
 | `owners` | UUID[] | a list of group members who have special privileges within the group |
-| `createDate` | UNIX timestamp | the date the group was created |
+| `createDate` | number | the date the group was created |
+| `updateDate` | number | the date and time the group was updated |
 | `tags` | string[] | tags that can be searched when users are looking for groups |

@@ -9,25 +9,21 @@ The Objectives data type will be transformed and returned as the value of the `c
   "id": "",
   "title": "",
   "description": "",
-  "creator": "",
-  "adoptions": "",
+  "goals": [
+    // Array of goal objects (see accompanying rest-goals.md file)
+  ],
+  "creator": "", // the username of the creator
+  "public": false,
+  "adoptions": 0,
+  "tags": [""],
+  "createDate": 0,
+  "updateDate": 0,
+  "targetDate": 0,
   "_links": {
     "self": "",
-    "goals": ""
-  }
-}
-```
-
-## Objective Goals Link Response
-
-```json5
-{
-  "total": 0,
-  "goals": [
-    // Array of RESTful goal objects (see accompanying documentation)
-  ],
-  "_links": {
-    "self": ""
+    "goals": "",
+    "adoptions": "",
+    "parent": "", // the resource URL representing the objective this was adopted from (if adopted)
   }
 }
 ```

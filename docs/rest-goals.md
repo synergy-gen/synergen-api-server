@@ -9,25 +9,21 @@ The Goal data type will be transformed and returned as the value of the `content
   "id": "",
   "title": "",
   "description": "",
-  "creator": "",
+  "tasks": [
+    // Array of task objects (see accompanying rest-tasks.md file)
+  ],
+  "creator": "", // the username of the creator
+  "public": false,
   "adoptions": 0,
+  "tags": [""],
+  "createDate": 0,
+  "updateDate": 0,
+  "targetDate": 0,
   "_links": {
     "self": "",
-    "tasks": ""
-  }
-}
-```
-
-## Goal Tasks Link Response
-
-```json5
-{
-  "total": 0,
-  "tasks": [
-    // Array of RESTful task objectis (see accompanying documentation)
-  ],
-  "_links": {
-    "self": ""
+    "tasks": "",
+    "adoptions": "",
+    "parent": "", // the URL of the resource representing the public goal this was adopted from (if adopted)
   }
 }
 ```
