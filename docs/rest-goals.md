@@ -27,3 +27,18 @@ The Goal data type will be transformed and returned as the value of the `content
   }
 }
 ```
+
+## New Goal
+
+When the server receives a new goal via a POST request, it will expect it to be in the following format
+
+```json5
+{
+  "title": "",
+  "description": "",
+  "tasks": [""], // array of strings containing task details
+  "tags": [""], // array of strings containing tag names
+  "creator": "", // the user id of the creator (not username)
+  "targetDate": 0,
+}
+```

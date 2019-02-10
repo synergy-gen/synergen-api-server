@@ -28,8 +28,12 @@ const self = (module.exports = {
                 ...t,
                 _links: `${self}/goals/${g.id}/tasks/${t.id}`
             })),
+            adoptions: g.adoptions.length || 0,
             _links: {
-                self: `${self}/goals/${g.id}`
+                self: `${self}/goals/${g.id}`,
+                tasks: `${self}/goals/${g.id}/tasks`,
+                adoptions: `${self}/goals/${g.id}/adoptions`,
+                parent: g.parent ? `` : null
             }
         }));
         return u;

@@ -12,9 +12,12 @@ const GoalSchema = new mongoose.Schema(
             default: []
         },
         creator: String,
-        adoptions: Number,
+        adoptions: { type: Array, of: String, default: [] },
+        parent: String,
         tags: [String],
-        createDate: { type: Number, required: true }
+        createDate: { type: Number, required: true },
+        updateDate: Number,
+        targetDate: Number
     },
     {
         strict: 'throw'

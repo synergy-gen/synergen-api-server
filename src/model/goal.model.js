@@ -13,9 +13,13 @@ class Goal {
             this.tasks = this.tasks.map(t => new Task(t));
         }
         this.creator = props.creator || null;
+        this.public = props.public || false;
         this.adoptions = props.adoptions || 0;
+        this.parent = props.parent || null;
         this.tags = props.tags || [];
         this.createDate = props.createDate || Date.now();
+        this.updateDate = props.updateDate || null;
+        this.targetDate = props.targetDate || null;
     }
 }
 
