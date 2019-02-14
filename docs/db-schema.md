@@ -51,7 +51,7 @@ A goal is essentially a collection of tasks. Goals are associated either publica
 | `creator` | UUID | the id of the user who created the goal (useful for public goals and tracking adoptions) |
 | `public` | boolean | flag to determine whether the goals has been published or not |
 | `parent` | UUID | the id of the public goal this goal was adopted from. Helpful for tracking stats and other followers. |
-| `adoptions` | UUID[] | an array of all the user ids of users who have adopted the goal |
+| `adoptions` | number | the number of times the goal has been adopted |
 | `tags` | string[] | tags that can be searched when users are looking for goals |
 | `createDate` | number | the date and time when the goal was created |
 | `targetDate` | number | the date (and time) when the goal should be accomplished (set per user or group) |
@@ -70,7 +70,7 @@ Objectives are collections of goals and are the highlest level of organization i
 | `creator` | UUID | the id of the user who created the objective (useful for public objectives and tracking adoptions) |
 | `public` | boolean | flag to determine whether the objective has been published or not |
 | `parent` | UUID | the id of the public objective from which this objecive was adopted |
-| `adoptions` | UUID[] | and array of user ids of users who have adopted the objective. Helpful for tracking stats. |
+| `adoptions` | number | the number of times the objective has been adopted |
 | `tags` | string[] | tags that can be searched when users are looking for objectives |
 | `createDate` | number | the date and time when the objective was created |
 | `targetDate` | number | the date (and time) when the objective should be accomplished (set per user or group) |

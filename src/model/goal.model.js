@@ -37,9 +37,9 @@ function merge(goal) {
     });
 }
 
-function find(query) {
+function find(query = {}) {
     q = {};
-    if (query && query.id) {
+    if (query.id) {
         q._id = query.id;
     }
     return new Promise((resolve, reject) => {

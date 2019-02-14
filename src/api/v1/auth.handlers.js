@@ -4,7 +4,6 @@ const response = require('./response');
 const status = require('http-status');
 const logger = require('winstonson')(module);
 const security = require('../../util/security');
-const userHandlers = require('./users.handlers');
 
 module.exports = {
     verifyAuthorized,
@@ -36,7 +35,7 @@ async function login(req, res) {
         let token = await security.generateToken(req.body.username);
         // Setting 'httpOnly' to false allows the client to delete the cookie
         res.cookie('auth', token, { httpOnly: false });
-        let userBody = userHandlers.generateUserResponse(user);
+        let userBody = response.generateUserResponseBody(user);
         return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', {
             user: userBody
         });
@@ -51,7 +50,7 @@ async function verifyAuthorized(req, res) {
     // success
     try {
         let user = await UserModel.find({ username: req.user.sub });
-        let body = userHandlers.generateUserResponse(user);
+        let body = response.generateUserResponseBody(user);
         return response.sendOkResponse(res, status.OK, 'Token still valid', { user: body });
     } catch (err) {
         logger.error(err);

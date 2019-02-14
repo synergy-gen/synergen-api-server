@@ -9,41 +9,9 @@ const config = require('config');
 const security = require('../../util/security');
 const _config = config.get('security');
 
-function generateResourceUrl(user) {
-    return `http://localhost:8080/api/v1/users/${user.id}`;
-}
-
-const self = (module.exports = {
-    generateUserResponse: user => {
-        let self = generateResourceUrl(user);
-        let u = { ...user };
-        u._links = {
-            self,
-            goals: self + '/goals',
-            objectives: self + '/objectives'
-        };
-        u.goals = u.goals.map(g => ({
-            ...g,
-            tasks: g.tasks.map(t => ({
-                ...t,
-                _links: `${self}/goals/${g.id}/tasks/${t.id}`
-            })),
-            adoptions: g.adoptions.length || 0,
-            _links: {
-                self: `${self}/goals/${g.id}`,
-                tasks: `${self}/goals/${g.id}/tasks`,
-                adoptions: `${self}/goals/${g.id}/adoptions`,
-                parent: g.parent ? `` : null
-            }
-        }));
-        return u;
-    },
-
+const _module = (module.exports = {
     addNewUser: async (req, res) => {
         try {
-            if (!req.body.username || !req.body.password) {
-                return response.sendErrorResponse(res, status.BAD_REQUEST, 'Missing username and/or password');
-            }
             logger.trace('Verifying user does not already exist');
             let user = await UserModel.find({ username: req.body.username });
             if (user !== undefined) {
@@ -63,7 +31,7 @@ const self = (module.exports = {
             let h = security.hash(algo, salt, req.body.password);
             await AuthModel.merge(new AuthModel.AuthInfo({ user: user.id, salt, algo, hash: h }));
             logger.trace('Authentication entry added. Preparing response');
-            let resBody = self.generateUserResponse(user);
+            let resBody = response.generateUserResponseBody(user);
             return response.sendOkResponse(res, status.CREATED, 'Successfully created new user', resBody);
         } catch (err) {
             logger.error(err);
@@ -75,7 +43,7 @@ const self = (module.exports = {
         try {
             logger.trace('Retrieving user');
             let user = await UserModel.find({ id: req.params.id });
-            let resBody = self.generateUserResponse(user);
+            let resBody = response.generateUserResponseBody(user);
             return response.sendOkResponse(res, status.OK, 'Successfully retrieved user information', resBody);
         } catch (err) {
             logger.error(err);
@@ -89,7 +57,7 @@ const self = (module.exports = {
             req.body.id = req.params.id;
             let updatedUser = await UserModel.merge(req.body);
             logger.trace('User updated. Preparing and sending response');
-            let resBody = self.generateUserResponse(updatedUser);
+            let resBody = response.generateUserResponseBody(updatedUser);
             return response.sendOkResponse(res, status.OK, 'Successfully saved user', resBody);
         } catch (err) {
             return response.sendErrorResponse(res, err, 'save user');
@@ -119,11 +87,24 @@ const self = (module.exports = {
             if (!user) {
                 return response.sendErrorResponse(res, status.BAD_REQUEST, 'Failed to add new goal to user');
             }
-            let body = self.generateUserResponse(user);
-            return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);
+            let body = response.generateUserResponseBody(user);
+            return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body.goals);
         } catch (err) {
             logger.error(err);
             return response.sendErrorResponse(res, err, 'add goal to user');
+        }
+    },
+
+    updateUserGoal: async (req, res) => {
+        try {
+            req.body.id = req.params.gid;
+            let goal = await UserModel.updateUserGoal(req.params.uid, req.body);
+            let userUrl = response.resource('/users/' + req.params.uid);
+            let resBody = response.generateGoalResponseBody(goal, userUrl + '/goals/' + goal.id);
+            return response.sendOkResponses(res, status.OK, "Successfully updated the user's goal", resBody);
+        } catch (err) {
+            logger.error(err);
+            return response.sendErrorResponse(res, err, "update user's goal");
         }
     },
 

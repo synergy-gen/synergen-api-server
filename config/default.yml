@@ -8,10 +8,15 @@ database:
     port: 27017
     name: synergen
 
-# Default server configurations
+# Default server configurations (this may be different than what a user sees due to reverse proxying)
 server:
+    scheme: http
     host: localhost
     port: 8585
+    api:
+        scheme: http
+        host: localhost
+        port: 8585
 
 # Default security configurations. These are mainly used to assist with creation/verification of JSON Web Tokens
 # to authenticate requests

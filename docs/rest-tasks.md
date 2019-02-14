@@ -9,7 +9,7 @@ The Task data type will be transformed and returned as the value of the `content
   "id": "",
   "details": "",
   "type": "",
-  "data": {},
+  "data": [],
   "createDate": 0,
   "updateDate": 0,
   "_links": {

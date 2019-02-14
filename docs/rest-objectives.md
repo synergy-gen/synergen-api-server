@@ -15,6 +15,7 @@ The Objectives data type will be transformed and returned as the value of the `c
   "creator": "", // the username of the creator
   "public": false,
   "adoptions": 0,
+  "parent": "", // the id of the parent objective, if it was adopted
   "tags": [""],
   "createDate": 0,
   "updateDate": 0,

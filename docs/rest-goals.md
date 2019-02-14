@@ -15,6 +15,7 @@ The Goal data type will be transformed and returned as the value of the `content
   "creator": "", // the username of the creator
   "public": false,
   "adoptions": 0,
+  "parent": "", // the id of the parent goal, if it was adopted
   "tags": [""],
   "createDate": 0,
   "updateDate": 0,
