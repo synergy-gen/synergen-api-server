@@ -7,12 +7,13 @@ const apiBase = `${config.scheme}://${config.host}${config.port ? ':' + config.p
 
 const _module = (module.exports = {
     resource: path => apiBase + path,
-    
+
     sendOkResponse: (res, status, message, content = {}) => {
         res.status(status).json({
             api: apiVersion,
             succuess: true,
-            status: status,
+            status: httpStatus[status],
+            code: status,
             timestamp: Date.now(),
             message,
             content
@@ -29,26 +30,31 @@ const _module = (module.exports = {
         };
         if (typeof err === 'number') {
             response.message = actionOrMessage;
-            response.status = err;
-            return res.status(response.status).json(response);
+            response.code = err;
+            response.status = httpStatus[err];
+            return res.status(response.code).json(response);
         } else {
             switch (err.code) {
                 case ErrorCodes.M_INVALID_FORMAT:
-                    response.status = httpStatus.BAD_REQUEST;
+                    response.code = httpStatus.BAD_REQUEST;
+                    response.status = httpStatus[response.code];
                     response.message = `Failed to ${actionOrMessage}: improperly formatted request`;
-                    return res.status(response.status).json(response);
+                    return res.status(response.code).json(response);
                 case ErrorCodes.A_AUTH_TOKEN_FAILURE:
-                    response.status = httpStatus.UNAUTHORIZED;
+                    response.code = httpStatus.UNAUTHORIZED;
+                    response.status = httpStatus[response.code];
                     response.message = `Failed to ${actionOrMessage}: invalid token`;
-                    return res.status(response.status).json(response);
+                    return res.status(response.code).json(response);
                 case ErrorCodes.F_FILE_FAILURE:
-                    response.status = httpStatus.INTERNAL_SERVER_ERROR;
+                    response.code = httpStatus.INTERNAL_SERVER_ERROR;
+                    response.status = httpStatus[response.code];
                     response.message = `Failed to ${actionOrMessage}: file failure`;
-                    return res.status(response.status).json(response);
+                    return res.status(response.code).json(response);
                 default:
-                    response.status = httpStatus.INTERNAL_SERVER_ERROR;
+                    response.code = httpStatus.INTERNAL_SERVER_ERROR;
+                    response.status = httpStatus[response.code];
                     response.message = `Failed to ${actionOrMessage}`;
-                    return res.status(response.status).json(response);
+                    return res.status(response.code).json(response);
             }
         }
     },

@@ -1,18 +1,18 @@
 const express = require('express');
 const handlers = require('./users.handlers');
 const passport = require('passport');
-const validate = require('./validate');
+const validateRequest = require('./validate');
 const joi = require('joi');
 
 const usersRouter = express.Router();
 
 const authentictionMiddleware = passport.authenticate('jwt', { session: false });
 
-const nameRegex = /^[a-zA-Z\s\-]$/;
+const nameRegex = /[a-zA-Z\s\-]/;
 
 usersRouter.post(
     '/users',
-    validate(
+    validateRequest(
         'add new user',
         joi.object().keys({
             name: joi
@@ -38,7 +38,7 @@ usersRouter.get('/users/:id', authentictionMiddleware, handlers.getUser);
 usersRouter.patch(
     '/users/:id',
     authentictionMiddleware,
-    validate(
+    validateRequest(
         'update user information',
         joi.object().keys({
             name: joi
@@ -64,12 +64,11 @@ usersRouter.delete('/users/:id', authentictionMiddleware, handlers.deleteUser);
 usersRouter.post(
     '/users/:id/goals',
     authentictionMiddleware,
-    validate(
+    validateRequest(
         'add new goal to user',
         joi.object().keys({
             title: joi
                 .string()
-                .alphanum()
                 .required(),
             description: joi.string().required(),
             tasks: joi
@@ -95,12 +94,11 @@ usersRouter.post(
 usersRouter.patch(
     '/users/:uid/goals/:gid',
     authentictionMiddleware,
-    validate(
+    validateRequest(
         "update user's goal",
         joi.object().keys({
             title: joi
                 .string()
-                .alphanum()
                 .optional(),
             description: joi.string().required(),
             tags: joi
