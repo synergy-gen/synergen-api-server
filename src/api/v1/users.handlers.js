@@ -42,7 +42,7 @@ const _module = (module.exports = {
     getUser: async (req, res) => {
         try {
             logger.trace('Retrieving user');
-            let user = await UserModel.find({ id: req.params.id });
+            let user = await UserModel.getUser(req.params.id);
             let resBody = response.generateUserResponseBody(user);
             return response.sendOkResponse(res, status.OK, 'Successfully retrieved user information', resBody);
         } catch (err) {

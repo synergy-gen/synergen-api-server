@@ -14,7 +14,7 @@ async function login(req, res) {
     try {
         if (!req.body.username || !req.body.password)
             return response.sendErrorResponse(res, status.BAD_REQUEST, 'Missing username and/or password');
-        let user = await UserModel.find({ username: req.body.username });
+        let user = await UserModel.getUserByUsername(req.body.username);
         if (!user)
             return response.sendErrorResponse(
                 res,
@@ -36,9 +36,7 @@ async function login(req, res) {
         // Setting 'httpOnly' to false allows the client to delete the cookie
         res.cookie('auth', token, { httpOnly: false });
         let userBody = response.generateUserResponseBody(user);
-        return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', {
-            user: userBody
-        });
+        return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', userBody);
     } catch (err) {
         logger.error(err);
         return response.sendErrorResponse(res, err, 'authenticate user');
@@ -49,9 +47,9 @@ async function verifyAuthorized(req, res) {
     // We should not get to this point unless the request came with a valid authorization token. Just return
     // success
     try {
-        let user = await UserModel.find({ username: req.user.sub });
+        let user = await UserModel.getUserByUsername(req.user.sub);
         let body = response.generateUserResponseBody(user);
-        return response.sendOkResponse(res, status.OK, 'Token still valid', { user: body });
+        return response.sendOkResponse(res, status.OK, 'Token still valid', body);
     } catch (err) {
         logger.error(err);
         return response.sendErrorResponse(

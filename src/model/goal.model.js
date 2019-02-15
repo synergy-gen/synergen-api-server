@@ -12,7 +12,7 @@ class Goal {
         if(this.tasks.length > 0 && !(this.tasks[0] instanceof Task)){
             this.tasks = this.tasks.map(t => new Task(t));
         }
-        this.creator = props.creator || null;
+        this.creator = props.creator && props.creator.username || props.creator || null;
         this.public = props.public || false;
         this.adoptions = props.adoptions || 0;
         this.parent = props.parent || null;

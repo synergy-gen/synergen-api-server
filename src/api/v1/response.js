@@ -87,7 +87,7 @@ const _module = (module.exports = {
             title: goal.title,
             description: goal.description,
             tasks: goal.tasks.map(task => _module.generateTaskResponseBody(task, selfUrl + '/tasks/' + task.id)),
-            creator: goal.creator.username,
+            creator: goal.creator,
             public: goal.public,
             adoptions: goal.adoptions,
             parent: goal.parent,
