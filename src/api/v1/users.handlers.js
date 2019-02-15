@@ -82,8 +82,7 @@ const _module = (module.exports = {
 
     addGoalToUser: async (req, res) => {
         try {
-            let goal = new Goal(req.body);
-            await UserModel.addGoalToUser(req.params.id, goal);
+            let goal = await UserModel.addGoalToUser(req.params.id, new Goal(req.body));
             let userUrl = response.resource('/users/' + req.params.uid);
             let body = response.generateGoalResponseBody(goal, userUrl + '/goals/' + goal.id);
             return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);
