@@ -86,7 +86,7 @@ const _module = (module.exports = {
             await UserModel.addGoalToUser(req.params.id, goal);
             let userUrl = response.resource('/users/' + req.params.uid);
             let body = response.generateGoalResponseBody(goal, userUrl + '/goals/' + goal.id);
-            return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body.goals);
+            return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);
         } catch (err) {
             logger.error(err);
             return response.sendErrorResponse(res, err, 'add goal to user');

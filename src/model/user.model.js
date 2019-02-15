@@ -142,11 +142,13 @@ module.exports = {
     addGoalToUser: (id, goal) => {
         return new Promise((resolve, reject) => {
             db.findOneAndUpdate({ _id: id }, { $push: { goals: { ...goal } } }, { new: true })
+                .populate('goals.creator', 'username')
                 .lean()
                 .exec((err, doc) => {
                     if (err) return reject(errors.translate(err, 'add goal to user'));
                     if (!doc) return resolve(undefined);
-                    return resolve(new User(doc));
+                    let newGoal = doc.goals.filter(g => g.id === goal.id)[0];
+                    return resolve(new Goal(newGoal));
                 });
         });
     },
@@ -166,6 +168,7 @@ module.exports = {
     updateUserGoal: (userId, goal) => {
         return new Promise((resolve, reject) => {
             db.findOneAndUpdate({ _id: userId, goals: goal.id }, { $set: { 'goals.$': { ...goal } } }, { new: true })
+                .populate('goals.creator', 'username')
                 .lean()
                 .exec((err, doc) => {
                     if (err) return reject(errors.translate(err, "update user's goal"));
