@@ -98,30 +98,26 @@ module.exports = {
     },
 
     getUser: id => {
-        aggregateUserQuery[0].$match = { _id: id };
         return new Promise((resolve, reject) => {
-            db.aggregate(aggregateUserQuery).exec((err, res) => {
-                if (err) return reject(errors.translate(err, 'retrieve user'));
-                let user = res[0];
-                user.goals.forEach(g => {
-                    g.creator = g.creator.username;
+            db.findOne({ _id: id })
+                .populate('goals.creator', 'username')
+                .lean()
+                .exec((err, res) => {
+                    if (err) return reject(errors.translate(err, 'retrieve user'));
+                    return resolve(new User(res));
                 });
-                return resolve(new User(user));
-            });
         });
     },
 
     getUserByUsername: username => {
-        aggregateUserQuery[0].$match = { username };
         return new Promise((resolve, reject) => {
-            db.aggregate(aggregateUserQuery).exec((err, res) => {
-                if (err) return reject(errors.translate(err, 'retrieve user'));
-                let user = res[0];
-                user.goals.forEach(g => {
-                    g.creator = g.creator.username;
+            db.findOne({ username })
+                .populate('goals.creator', 'username')
+                .lean()
+                .exec((err, res) => {
+                    if (err) return reject(errors.translate(err, 'retrieve user'));
+                    return resolve(new User(res));
                 });
-                return resolve(new User(user));
-            });
         });
     },
 

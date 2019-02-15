@@ -11,7 +11,7 @@ const GoalSchema = new mongoose.Schema(
             of: TaskSchema,
             default: []
         },
-        creator: String,
+        creator: { type: String, ref: 'User' },
         adoptions: { type: Array, of: String, default: [] },
         parent: String,
         tags: [String],
