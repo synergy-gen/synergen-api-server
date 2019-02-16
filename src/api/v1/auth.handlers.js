@@ -12,17 +12,14 @@ module.exports = {
 
 async function login(req, res) {
     try {
-        if (!req.body.username || !req.body.password)
-            return response.sendErrorResponse(res, status.BAD_REQUEST, 'Missing username and/or password');
-        let user = await UserModel.getUserByUsername(req.body.username);
+        let username = req.body.username;
+        let user = await UserModel.findByUsername(username);
         if (!user)
-            return response.sendErrorResponse(
-                res,
-                status.NOT_FOUND,
-                `Could not find user with username '${req.body.username}'`
-            );
-        let authInfo = await AuthModel.find({ user: user.id });
+            return response.sendErrorResponse(res, status.NOT_FOUND, `Could not find user with username '${username}'`);
+
+        let authInfo = await AuthModel.findByUserId(user.id);
         if (!authInfo) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to authenticate user');
+
         let hashed = security.hash(authInfo.algo, authInfo.salt, req.body.password);
         if (hashed != authInfo.hash) {
             return response.sendErrorResponse(
@@ -31,10 +28,13 @@ async function login(req, res) {
                 `Incorrect password for user '${req.body.username}'`
             );
         }
+
         // Authentication succeeded, generate a token and return it to the user
         let token = await security.generateToken(req.body.username);
+
         // Setting 'httpOnly' to false allows the client to delete the cookie
         res.cookie('auth', token, { httpOnly: false });
+
         let userBody = response.generateUserResponseBody(user);
         return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', userBody);
     } catch (err) {
@@ -47,7 +47,7 @@ async function verifyAuthorized(req, res) {
     // We should not get to this point unless the request came with a valid authorization token. Just return
     // success
     try {
-        let user = await UserModel.getUserByUsername(req.user.sub);
+        let user = await UserModel.findByUsername(req.user.sub);
         let body = response.generateUserResponseBody(user);
         return response.sendOkResponse(res, status.OK, 'Token still valid', body);
     } catch (err) {

@@ -52,14 +52,11 @@ usersRouter.patch(
             email: joi
                 .string()
                 .email()
-                .optional(),
-            password: joi.string().required()
+                .optional()
         })
     ),
     handlers.updateUser
 );
-
-usersRouter.delete('/users/:id', authentictionMiddleware, handlers.deleteUser);
 
 usersRouter.post(
     '/users/:id/goals',

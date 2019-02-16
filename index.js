@@ -1,42 +1,32 @@
 const express = require('express');
+const db = require('./src/util/db-connection');
 const config = require('config');
 const api = require('./src/api/v1/routes');
-const mongoose = require('mongoose');
 const morgan = require('morgan');
 const logger = require('winstonson')(module);
+
 logger.setDateFormat('YYYY-MM-DD HH:MM:ss.SSS');
-
 const serverConfig = config.get('server');
-const databaseConfig = config.get('database');
-let userPass = '';
-try {
-    userPass = databaseConfig.get('user') + ':' + databaseConfig.get('pass') + '@';
-} catch(err) {
-    console.log('No user/password for MongoDB specified. No authentication parameters will be provided in connection');
-}
-const mongoUrl = `mongodb://${userPass}${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.name}`;
-
 process.title = 'synergen-api-server';
 
-mongoose.connect(
-    mongoUrl,
-    { useNewUrlParser: true, useFindAndModify: false }
-);
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log(`Connected to Mongo at ${databaseConfig.host}:${databaseConfig.port}`);
+db.connect(err => {
+    if (err) throw err;
+
     const app = express();
 
     // Add trace logging on HTTP requests with Morgan
-    app.use(morgan('---> :remote-addr :remote-user :method :url HTTP/:http-version', {
-        immediate: true,
-        stream: logger.stream('trace')
-    }));
-    app.use(morgan('<--- :method :url :status :res[content-length]', {
-        immediate: false,
-        stream: logger.stream('trace')
-    }));
+    app.use(
+        morgan('---> :remote-addr :remote-user :method :url HTTP/:http-version', {
+            immediate: true,
+            stream: logger.stream('trace')
+        })
+    );
+    app.use(
+        morgan('<--- :method :url :status :res[content-length]', {
+            immediate: false,
+            stream: logger.stream('trace')
+        })
+    );
 
     app.use(api);
 
@@ -52,6 +42,9 @@ db.once('open', () => {
     process.on('SIGINT', () => {
         console.log('\nClosing server');
         server.close();
+        console.log('Closing database connection');
+        db.close();
+        console.log('Goodbye');
         process.exit(0);
     });
 });

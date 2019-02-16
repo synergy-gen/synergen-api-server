@@ -2,8 +2,7 @@
 
 Synergen uses a NoSQL database to persist user data. This document describes the schema for how that data should be stored. The database will comprise of four collections.
 - A `users` collection containing User data (User[])
-- A `goals` collection containing goal data (Goal[])
-- A `tasks` collection containing task data, including completion data and history (Task[])
+- A `goals` collection containing public goal data (Goal[])
 - A `objectives` collection containing public objective data (Objective[])
 - A `groups` collection containing available group information (Group[])
 
@@ -15,7 +14,7 @@ A user is any person using the system. A user has the following attributes:
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `id` | UUID | |
+| `_id` | UUID | |
 | `name` | string | the name of the user |
 | `username` | string | the username defined by the user that can uniquely identify this user. Mutable. |
 | `email` | string | the email address of the user |
@@ -32,7 +31,7 @@ A task is the smallest unit of data in the Synergen service. It has the followin
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `id` | UUID | |
+| `_id` | UUID | |
 | `details` | string | the details of the task |
 | `type` | string | the type of task (defaults to `check`) |
 | `data` | *depends* | additional data associated with the task, determined by the `type` |
@@ -45,7 +44,7 @@ A goal is essentially a collection of tasks. Goals are associated either publica
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `id` | UUID | |
+| `_id` | UUID | |
 | `title` | string | the title of the goal |
 | `description` | string | a brief description of the goal |
 | `tasks` | Task[] | a list of tasks associated with the goal |
@@ -64,7 +63,7 @@ Objectives are collections of goals and are the highlest level of organization i
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `id` | UUID | |
+| `_id` | UUID | |
 | `title` | string | the title of the objective |
 | `description` | string | a brief description of the objective |
 | `goals` | Goal[] | a list of goals associated with the objective |
@@ -83,7 +82,7 @@ Groups are collections of users. They are currently always public from the momen
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `id` | UUID | |
+| `_id` | UUID | |
 | `name` | string | the name of the group |
 | `description` | string | a brief description of the group |
 | `goals` | Goal[] | a list of goals associated with the group |

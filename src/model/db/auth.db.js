@@ -1,17 +1,26 @@
-const mongoose = require('mongoose');
+const joi = require('joi');
 
-const Auth = new mongoose.Schema(
-    {
-        _id: { type: String, required: true },
-        user: { type: String, required: true },
-        salt: { type: String, required: true },
-        hash: { type: String, required: true },
-        algo: { type: String, required: true },
-        last: { type: String, required: true }
+const AuthSchema = joi.object().keys({
+    _id: joi.string().required(),
+    user: joi
+        .string()
+        .alphanum()
+        .required(),
+    salt: joi.string().required(),
+    hash: joi.string().required(),
+    algo: joi
+        .string()
+        .valid(['sha256'])
+        .required()
+});
+
+module.exports = {
+    validate: obj => {
+        let results = joi.validate(obj, AuthSchema);
+        if (results.error) {
+            return results.error.details.map(detail => detail.message);
+        }
+        return null;
     },
-    {
-        strict: 'throw'
-    }
-);
-
-module.exports = mongoose.model('Auth', Auth);
+    authCollectionName: 'auth'
+};

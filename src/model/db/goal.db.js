@@ -1,27 +1,45 @@
-const mongoose = require('mongoose');
-const TaskSchema = require('./task.db').schema;
+const joi = require('joi');
+const { TaskSchema } = require('./task.db');
 
-const GoalSchema = new mongoose.Schema(
-    {
-        _id: { type: String, required: true },
-        title: String,
-        description: String,
-        tasks: {
-            type: Array,
-            of: TaskSchema,
-            default: []
-        },
-        creator: { type: String, ref: 'User' },
-        adoptions: { type: Array, of: String, default: [] },
-        parent: String,
-        tags: [String],
-        createDate: { type: Number, required: true },
-        updateDate: Number,
-        targetDate: Number
+const GoalSchema = joi.object().keys({
+    _id: joi.string().required(),
+    title: joi.string().required(),
+    description: joi.string().required(),
+    tasks: joi
+        .array()
+        .items(TaskSchema)
+        .required(),
+    creator: joi.string().required(),
+    public: joi.bool().required(),
+    adoptions: joi.number().integer(),
+    parent: joi.string().allow(['', null]),
+    tags: joi.array().items(joi.string()),
+    createDate: joi
+        .number()
+        .integer()
+        .required(),
+    updateDate: joi
+        .number()
+        .integer()
+        .allow(null),
+    beginDate: joi
+        .number()
+        .integer()
+        .allow(null),
+    targetDate: joi
+        .number()
+        .integer()
+        .allow(null)
+});
+
+module.exports = {
+    validate: obj => {
+        let result = joi.validate(obj, GoalSchema);
+        if (result.error) {
+            return result.error.details.map(detail => detail.message);
+        }
+        return null;
     },
-    {
-        strict: 'throw'
-    }
-);
-
-module.exports = mongoose.model('Goal', GoalSchema);
+    GoalSchema,
+    goalCollectionName: 'goals'
+};

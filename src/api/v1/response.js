@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { ErrorCodes } = require('../../util/error');
+const ErrorCodes = require('../../util/error').SynergenError.Codes;
 const config = require('config').get('server').api;
 const apiVersion = 'v1';
 

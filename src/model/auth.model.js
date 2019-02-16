@@ -1,6 +1,7 @@
-const db = require('./db/auth.db');
-const errors = require('../util/error');
 const shortid = require('shortid');
+const { validate, authCollectionName } = require('./db/auth.db');
+const db = require('../util/db-connection');
+const { SynergenError } = require('../util/error');
 
 class AuthInfo {
     constructor(properties) {
@@ -9,7 +10,6 @@ class AuthInfo {
         this.salt = properties.salt || '';
         this.hash = properties.hash || '';
         this.algo = properties.algo || AuthInfo.Algorithm.SHA256;
-        this.last = properties.last || Date.now();
     }
 }
 
@@ -17,49 +17,50 @@ AuthInfo.Algorithm = {
     SHA256: 'sha256'
 };
 
-function find(query) {
-    let q = {};
-    if (query.id) q._id = query.id;
-    if (query.user) q.user = query.user;
-    return new Promise((resolve, reject) => {
-        db.find(q)
-            .lean()
-            .exec((err, docs) => {
-                if (err) return reject(errors.translate(err, 'retrieve authentication info'));
-                if (!docs || docs.length == 0) {
-                    return resolve(undefined);
-                }
-                if (docs.length == 1) {
-                    return resolve(new AuthInfo(docs[0]));
-                }
-                return resolve(docs.map(doc => new AuthInfo(doc)));
-            });
-    });
-}
-
-function merge(authInfo) {
-    return new Promise((resolve, reject) => {
-        db.findOneAndUpdate({ _id: authInfo.id }, authInfo, { new: true, upsert: true })
-            .lean()
-            .exec((err, doc) => {
-                if (err) return reject(errors.translate(err, 'save authentication info'));
-                return resolve(new AuthInfo(doc));
-            });
-    });
-}
-
-function remove(query) {
-    return new Promise((resolve, reject) => {
-        db.deleteMany(query, err => {
-            if (err) return reject(errors.translate(err, 'remove authentication info'));
-            return resolve(true);
-        });
-    });
-}
-
 module.exports = {
     AuthInfo,
-    find,
-    merge,
-    remove
+
+    merge: async info => {
+        try {
+            let authObj = { ...info };
+            authObj._id = authObj.id;
+            delete authObj.id;
+            let errors = validate(authObj);
+            if (errors) {
+                throw new SynergenError(
+                    'Failed to save auth information: invalid format',
+                    SynergenError.Codes.M_INVALID_FORMAT,
+                    errors
+                );
+            }
+
+            // Everything looks good, start persisting
+            await db.collection(authCollectionName).updateOne({ _id: info.id }, { $set: authObj }, { upsert: true });
+
+            return true;
+        } catch (err) {
+            if (err instanceof SynergenError) throw err;
+            throw new SynergenError('Failed to save auth information: ' + err.message);
+        }
+    },
+
+    find: async id => {
+        try {
+            let doc = await db.collection(authCollectionName).findOne({ _id: id });
+            if (!doc) return null;
+            return new AuthInfo(doc);
+        } catch (err) {
+            throw new SynergenError('Failed to retrieve auth info: ' + err.message);
+        }
+    },
+
+    findByUserId: async userId => {
+        try {
+            let doc = await db.collection(authCollectionName).findOne({ user: userId });
+            if (!doc) return null;
+            return new AuthInfo(doc);
+        } catch (err) {
+            throw new SynergenError('Failed to retrieve auth info: ' + err.message);
+        }
+    }
 };

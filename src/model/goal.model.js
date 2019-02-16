@@ -1,7 +1,9 @@
 const shortid = require('shortid');
-const db = require('./db/goal.db');
-const errors = require('../util/error');
-const { Task } = require('./task.model');
+const { validate, goalCollectionName } = require('./db/goal.db');
+const db = require('../util/db-connection');
+const { SynergenError } = require('../util/error');
+const TaskModel = require('./task.model');
+const { Task } = TaskModel;
 
 class Goal {
     constructor(props = {}) {
@@ -9,10 +11,10 @@ class Goal {
         this.title = props.title || null;
         this.description = props.description || null;
         this.tasks = props.tasks || [];
-        if(this.tasks.length > 0 && !(this.tasks[0] instanceof Task)){
+        if (this.tasks.length > 0 && !(this.tasks[0] instanceof Task)) {
             this.tasks = this.tasks.map(t => new Task(t));
         }
-        this.creator = props.creator && props.creator.username || props.creator || null;
+        this.creator = (props.creator && props.creator.username) || props.creator || null;
         this.public = props.public || false;
         this.adoptions = props.adoptions || 0;
         this.parent = props.parent || null;
@@ -23,62 +25,50 @@ class Goal {
     }
 }
 
-function merge(goal) {
-    return new Promise((resolve, reject) => {
-        db.findOneAndUpdate({ _id: goal.id }, goal, { upsert: true, new: true })
-            .lean()
-            .exec((err, doc) => {
-                if (err) return reject(errors.translate(err, 'save goal'));
-                if (!doc) {
-                    return resolve(undefined);
-                }
-                return resolve(new Goal(doc));
-            });
-    });
-}
-
-function find(query = {}) {
-    q = {};
-    if (query.id) {
-        q._id = query.id;
-    }
-    return new Promise((resolve, reject) => {
-        db.find(q)
-            .lean()
-            .exec((err, docs) => {
-                if (err) return reject(errors.translate(err, 'retrieve goal information'));
-                if (!docs || docs.length === 0) {
-                    return resolve(undefined);
-                }
-                if (docs.length == 1) {
-                    return resolve(new Goal(docs[0]));
-                }
-                return resolve(docs.map(doc => new Goal(doc)));
-            });
-    });
-}
-
-function remove(query) {
-    let q = {};
-    if (query.id) {
-        q._id = query.id;
-    }
-    return new Promise((resolve, reject) => {
-        db.deleteMany(q)
-            .lean()
-            .exec((err, result) => {
-                if (err) return reject(errors.translate(err, 'remove goal information'));
-                if (result && result.n === 0) {
-                    return resolve(false);
-                }
-                return resolve(true);
-            });
-    });
-}
-
 module.exports = {
     Goal,
-    merge,
-    find,
-    remove
+
+    merge: async goal => {
+        try {
+            // Some application-level preparation/validation before persisting in the database
+            let goalObj = { ...goal };
+            goalObj._id = goalObj.id;
+            delete goalObj.id;
+            goalObj.tasks = goalObj.tasks.map(task => task.id);
+            let errors = validate(goalObj);
+            if (errors)
+                throw new SynergenError(
+                    'Failed to save goal information: invalid format',
+                    SynergenError.Codes.M_INVALID_FORMAT,
+                    errors
+                );
+
+            await db.collection(goalCollectionName).updateOne({ _id: goal.id }, { $set: goalObj }, { upsert: true });
+
+            return true;
+        } catch (err) {
+            if (err instanceof SynergenError) throw err;
+            throw new SynergenError('Failed to save goal information: ' + err.message);
+        }
+    },
+
+    findMany: async ids => {
+        try {
+            let docs = await db
+                .collection(goalCollectionName)
+                .find({ _id: { $in: ids } })
+                .toArray();
+            if (!docs) return [];
+            let goals = [];
+            for (let doc of docs) {
+                if (doc.tasks && doc.tasks.length > 0) {
+                    doc.tasks = await TaskModel.findMany(doc.tasks);
+                }
+                goals.push(new Goal(doc));
+            }
+            return goals;
+        } catch (err) {
+            throw new SynergenError('Failed to retrieve multiple goals: ' + err.message);
+        }
+    }
 };
