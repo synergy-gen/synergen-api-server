@@ -1,6 +1,7 @@
 const UserModel = require('../../model/user.model');
 const AuthModel = require('../../model/auth.model');
 const { Goal } = require('../../model/goal.model');
+const { Task } = require('../../model/task.model');
 const response = require('./response');
 const status = require('http-status');
 const logger = require('winstonson')(module);
@@ -113,6 +114,18 @@ const _module = (module.exports = {
         } catch (err) {
             logger.error(err);
             return response.sendErrorResponse(res, err, 'add goal to user');
+        }
+    },
+
+    addTaskToUserGoal: async (req, res) => {
+        try {
+            let task = await UserModel.addTaskToUserGoal(req.params.uid, req.params.gid, new Task(req.body));
+            let url = '/users/' + req.params.uid + '/goals/' + req.params.gid + '/tasks/' + task.id;
+            let body = response.generateTaskResponseBody(task, url);
+            return response.sendOkResponse(res.status.CREATED, "Sucessfully added task to user's existing goal", body);
+        } catch (err) {
+            logger.error(err);
+            return response.sendErrorResponse(res, err, 'add task to user goal');
         }
     }
 });

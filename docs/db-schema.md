@@ -2,7 +2,8 @@
 
 Synergen uses a NoSQL database to persist user data. This document describes the schema for how that data should be stored. The database will comprise of four collections.
 - A `users` collection containing User data (User[])
-- A `goals` collection containing public goal data (Goal[])
+- A `goals` collection containing goal data (Goal[])
+- A `tasks` collection containing task data, including completion data and history (Task[])
 - A `objectives` collection containing public objective data (Objective[])
 - A `groups` collection containing available group information (Group[])
 

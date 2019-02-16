@@ -2,6 +2,7 @@ const db = require('./db/user.db');
 const errors = require('../util/error');
 const shortid = require('shortid');
 const { Goal } = require('./goal.model');
+const { Task } = require('./task.model');
 
 class User {
     constructor(props) {
@@ -167,7 +168,7 @@ module.exports = {
 
     updateUserGoal: (userId, goal) => {
         return new Promise((resolve, reject) => {
-            db.findOneAndUpdate({ _id: userId, goals: goal.id }, { $set: { 'goals.$': { ...goal } } }, { new: true })
+            db.findOneAndUpdate({ _id: userId, 'goals.id': goal.id }, { $set: { 'goals.$': { ...goal } } }, { new: true })
                 .populate('goals.creator', 'username')
                 .lean()
                 .exec((err, doc) => {
@@ -176,6 +177,24 @@ module.exports = {
                     // Extract the goal we just updated
                     let goal = doc.goals.filter(g => g._id === goal.id)[0];
                     return resolve(new Goal(goal));
+                });
+        });
+    },
+
+    addTaskToUserGoal: (userId, goalId, task) => {
+        return new Promise((resolve, reject) => {
+            db.findOneAndUpdate(
+                { _id: userId, 'goals.id': goalId },
+                { $push: { 'goals.$.tasks': { ...task } } },
+                { new: true }
+            )
+                .populate('goals.creator', 'username')
+                .lean()
+                .exec((err, doc) => {
+                    if (err) return reject(errors.translate(err, 'add goal to user'));
+                    if (!doc) return resolve(undefined);
+                    let task = doc.goals.find(g => g.id === goalId).tasks.find(t => t.id === task.id);
+                    return resolve(new Task(task));
                 });
         });
     }

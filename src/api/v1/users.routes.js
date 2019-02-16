@@ -67,9 +67,7 @@ usersRouter.post(
     validateRequest(
         'add new goal to user',
         joi.object().keys({
-            title: joi
-                .string()
-                .required(),
+            title: joi.string().required(),
             description: joi.string().required(),
             tasks: joi
                 .array()
@@ -97,9 +95,7 @@ usersRouter.patch(
     validateRequest(
         "update user's goal",
         joi.object().keys({
-            title: joi
-                .string()
-                .optional(),
+            title: joi.string().optional(),
             description: joi.string().required(),
             tags: joi
                 .array()
@@ -112,6 +108,18 @@ usersRouter.patch(
         })
     ),
     handlers.updateUserGoal
+);
+
+usersRouter.post(
+    '/users/:uid/goals/:gid/tasks',
+    authentictionMiddleware,
+    validateRequest(
+        "add task to user's goal",
+        joi.object().keys({
+            details: joi.string().allow('').required()
+        })
+    ),
+    handlers.addTaskToUserGoal
 );
 
 module.exports = usersRouter;
