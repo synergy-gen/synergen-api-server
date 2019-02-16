@@ -63,11 +63,11 @@ const _module = (module.exports = {
             if (!doc) return null;
             // Map the creator IDs to usernames
             for (let goal of doc.goals) {
-                if (doc.username !== username) {
+                if (doc._id !== id) {
                     let creator = await _module.find(goal.creator);
                     goal.creator = creator.username;
                 } else {
-                    goal.creator = username;
+                    goal.creator = doc.username;
                 }
             }
             return new User(doc);

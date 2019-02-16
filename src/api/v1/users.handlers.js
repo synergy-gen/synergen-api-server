@@ -88,6 +88,7 @@ const _module = (module.exports = {
             user.goals.push(goal);
             await UserModel.merge(user);
 
+            goal.creator = user.username;
             let userUrl = response.resource('/users/' + req.params.uid);
             let body = response.generateGoalResponseBody(goal, userUrl + '/goals/' + goal.id);
             return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);

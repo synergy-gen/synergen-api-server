@@ -34,7 +34,6 @@ A task is the smallest unit of data in the Synergen service. It has the followin
 | `_id` | UUID | |
 | `details` | string | the details of the task |
 | `type` | string | the type of task (defaults to `check`) |
-| `data` | *depends* | additional data associated with the task, determined by the `type` |
 | `createDate` | number | the date when the task was created |
 | `updateDate` | number | the date and time when the task was updated |
 
