@@ -67,10 +67,7 @@ const _module = (module.exports = {
         try {
             logger.trace('Updating user information for user ' + req.params.id);
             let user = await UserModel.find(req.params.id);
-            if (req.body.username) user.username = req.body.username;
-            if (req.body.name) user.name = req.body.name;
-            if (req.body.email) user.email = req.body.email;
-            await UserModel.merge(user);
+            await UserModel.merge({ ...user, ...req.body });
 
             logger.trace('User updated. Preparing and sending response');
             let resBody = response.generateUserResponseBody(user);
@@ -107,13 +104,28 @@ const _module = (module.exports = {
             if (goalIndex < 0)
                 return sendErrorResponse(res, status.NOT_FOUND, 'Failed to find goal with id ' + req.params.gid);
 
-            user.goals[goalIndex] = { ...user.goals[goalIndex], ...req.body };
+            let goal = user.goals[goalIndex];
+            if (req.body.tasks) {
+                req.body.tasks.forEach(task => {
+                    if (task.id) {
+                        let i = goal.tasks.findIndex(t => t.id === task.id);
+                        if (i > 0) goal.tasks[i].details = task.details;
+                    } else {
+                        goal.tasks.push(new Task(task));
+                    }
+                });
+                // We've finished processing the tasks. Remove them so that we don't merge them with additional
+                // changes
+                delete req.body.tasks;
+            }
+
+            user.goals[goalIndex] = { ...goal, ...req.body };
             await UserModel.merge(user);
 
             let userUrl = response.resource('/users/' + req.params.uid);
             let resBody = response.generateGoalResponseBody(user.goals[goalIndex], userUrl + '/goals/' + goal.id);
 
-            return response.sendOkResponses(res, status.OK, "Successfully updated the user's goal", resBody);
+            return response.sendOkResponse(res, status.OK, "Successfully updated the user's goal", resBody);
         } catch (err) {
             logger.error(err);
             return response.sendErrorResponse(res, err, "update user's goal");
@@ -133,28 +145,6 @@ const _module = (module.exports = {
         } catch (err) {
             logger.error(err);
             return response.sendErrorResponse(res, err, 'add goal to user');
-        }
-    },
-
-    addTaskToUserGoal: async (req, res) => {
-        try {
-            let user = await UserModel.find(req.params.uid);
-            if (!user) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user to add goal task');
-
-            let goalIndex = user.goals.findIndex(g => g.id === req.params.gid);
-            if (goalIndex < 0)
-                return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find goal to add task to');
-
-            let task = new Task(req.body);
-            user.goals[goalIndex].tasks.push(task);
-            await UserModel.merge(user);
-
-            let url = '/users/' + req.params.uid + '/goals/' + req.params.gid + '/tasks/' + task.id;
-            let body = response.generateTaskResponseBody(task, url);
-            return response.sendOkResponse(res.status.CREATED, "Sucessfully added task to user's existing goal", body);
-        } catch (err) {
-            logger.error(err);
-            return response.sendErrorResponse(res, err, 'add task to user goal');
         }
     }
 });

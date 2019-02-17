@@ -27,13 +27,15 @@ const _module = (module.exports = {
 
     merge: async user => {
         try {
-            let userObj = { ...user };
+            let userObj = { ...user, goals: [] };
             userObj._id = userObj.id;
             delete userObj.id;
-            userObj.goals = userObj.goals.map(goal => {
+            userObj.goals = user.goals.map(g => {
+                let goal = { ...g, tasks: [] };
                 goal._id = goal.id;
                 delete goal.id;
-                goal.tasks.map(task => {
+                goal.tasks = g.tasks.map(t => {
+                    let task = { ...t };
                     task._id = task.id;
                     delete task.id;
                     return task;
