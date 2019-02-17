@@ -106,17 +106,20 @@ const _module = (module.exports = {
 
             let goal = user.goals[goalIndex];
             if (req.body.tasks) {
+                let tasks = [];
                 req.body.tasks.forEach(task => {
                     if (task.id) {
                         let i = goal.tasks.findIndex(t => t.id === task.id);
                         if (i > 0) goal.tasks[i].details = task.details;
+                        tasks.push(goal.tasks[i]);
                     } else {
-                        goal.tasks.push(new Task(task));
+                        tasks.push(new Task(task));
                     }
                 });
                 // We've finished processing the tasks. Remove them so that we don't merge them with additional
                 // changes
                 delete req.body.tasks;
+                goal.tasks = tasks;
             }
 
             user.goals[goalIndex] = { ...goal, ...req.body };
