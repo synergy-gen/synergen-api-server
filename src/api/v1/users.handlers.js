@@ -86,7 +86,7 @@ const _module = (module.exports = {
             await UserModel.merge(user);
 
             goal.creator = user.username;
-            let userUrl = response.resource('/users/' + req.params.uid);
+            let userUrl = response.resource('/users/' + req.params.id);
             let body = response.generateGoalResponseBody(goal, userUrl + '/goals/' + goal.id);
             return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);
         } catch (err) {
@@ -147,7 +147,7 @@ const _module = (module.exports = {
             return response.sendOkResponse(res, status.OK, 'Successfully removed goal from user');
         } catch (err) {
             logger.error(err);
-            return response.sendErrorResponse(res, err, 'add goal to user');
+            return response.sendErrorResponse(res, err, 'remove goal to user');
         }
     }
 });

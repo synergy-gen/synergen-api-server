@@ -94,9 +94,7 @@ usersRouter.patch(
         joi.object().keys({
             title: joi.string(),
             description: joi.string(),
-            tags: joi
-                .array()
-                .items(joi.string()),
+            tags: joi.array().items(joi.string()),
             tasks: joi.array().items(
                 joi.object().keys({
                     id: joi.string(),
@@ -111,5 +109,7 @@ usersRouter.patch(
     ),
     handlers.updateUserGoal
 );
+
+usersRouter.delete('/users/:uid/goals/:gid', authentictionMiddleware, handlers.removeGoalFromUser);
 
 module.exports = usersRouter;
