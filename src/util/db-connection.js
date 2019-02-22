@@ -8,7 +8,7 @@ try {
 } catch (err) {
     console.log('No user/password for MongoDB specified. No authentication parameters will be provided in connection');
 }
-const mongoUrl = `mongodb://${userPass}${databaseConfig.host}:${databaseConfig.port}`;
+const mongoUrl = `mongodb://${userPass}${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.name}`;
 
 let _connection = null;
 let _client = null;
