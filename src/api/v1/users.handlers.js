@@ -147,6 +147,7 @@ const _module = (module.exports = {
             return response.sendOkResponse(res, status.OK, 'Successfully removed goal from user');
         } catch (err) {
             logger.error(err);
+            if(err.details) logger.error(err.details);
             return response.sendErrorResponse(res, err, 'remove goal to user');
         }
     }
