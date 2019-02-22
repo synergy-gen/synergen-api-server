@@ -6,7 +6,7 @@ class Task {
             props = { details: props };
         }
         this.id = props.id || props._id || shortid.generate();
-        this.details = props.details || null;
+        this.details = props.details || '';
         this.type = props.type || Task.Types.CHECK;
         this.createDate = props.createDate || Date.now();
         this.updateDate = props.updateDate || null;
