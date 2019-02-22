@@ -2,7 +2,10 @@ const joi = require('joi');
 
 const TaskSchema = joi.object().keys({
     _id: joi.string().required(),
-    details: joi.string().required(),
+    details: joi
+        .string()
+        .allow('')
+        .required(),
     type: joi.string().valid(['check']),
     data: joi.object().allow(null),
     createDate: joi
