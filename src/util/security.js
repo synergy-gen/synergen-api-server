@@ -3,7 +3,7 @@ const fs = require('fs');
 const config = require('config');
 const path = require('path');
 const { SynergenError, ErrorCodes } = require('./error');
-const { Strategy } = require('passport-jwt');
+const { Strategy, ExtractJwt } = require('passport-jwt');
 const crypto = require('crypto');
 
 let _config = config.get('security');
@@ -36,13 +36,7 @@ function createPassportStrategy(cb) {
 function _generateStrategy() {
     return new Strategy(
         {
-            jwtFromRequest: function(req) {
-                let token = null;
-                if (req && req.cookies) {
-                    token = req.cookies.auth;
-                }
-                return token;
-            },
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             issuer: _issuer,
             audience: _audience,
             secretOrKey: _secret
@@ -54,11 +48,20 @@ function _generateStrategy() {
     );
 }
 
-function generateToken(subject) {
+function cookieExtractor() {
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies.auth;
+    }
+    return token;
+}
+
+function generateToken(subject, uid) {
     let payload = {
         iss: _issuer,
         sub: subject,
         aud: _audience,
+        uid: uid,
         exp: Math.floor(Date.now() / 1000) + 60 * 60
     };
     return new Promise((resolve, reject) => {

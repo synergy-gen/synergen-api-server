@@ -38,13 +38,13 @@ async function login(req, res) {
 
         logger.trace('Successfully authenticated user');
         // Authentication succeeded, generate a token and return it to the user
-        let token = await security.generateToken(req.body.username);
+        let token = await security.generateToken(user.username, user.id);
 
-        // Setting 'httpOnly' to false allows the client to delete the cookie
-        res.cookie('auth', token, { httpOnly: false });
+        // The token is now provided in the body and sent in requests using the 'Bearer' scheme in the HTTP
+        // Authorization header
+        let body = { token, uid: user.id };
 
-        let userBody = response.generateUserResponseBody(user);
-        return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', userBody);
+        return response.sendOkResponse(res, status.OK, 'Successfully authenticated user', body);
     } catch (err) {
         logger.error(err);
         if (err.details) logger.error(err.details);
@@ -55,16 +55,5 @@ async function login(req, res) {
 async function verifyAuthorized(req, res) {
     // We should not get to this point unless the request came with a valid authorization token. Just return
     // success
-    try {
-        let user = await UserModel.findByUsername(req.user.sub);
-        let body = response.generateUserResponseBody(user);
-        return response.sendOkResponse(res, status.OK, 'Token still valid', body);
-    } catch (err) {
-        logger.error(err);
-        return response.sendErrorResponse(
-            res,
-            status.INTERNAL_SERVER_ERROR,
-            'Could not verify if user is authenticated'
-        );
-    }
+    return response.sendOkResponse(res, status.OK, 'Token still valid', { uid: req.user.uid });
 }
