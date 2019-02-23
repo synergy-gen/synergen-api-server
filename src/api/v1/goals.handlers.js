@@ -53,14 +53,14 @@ const _module = (module.exports = {
     addPublicGoal: async (req, res) => {
         try {
             logger.info('Adding new public goal');
-            let package = new PublicGoalPackage(req.body);
+            let package = new PublicGoalPackage({ latest: req.body, creator: req.body.creator, tags: req.body.tags });
             await publicGoals.merge(package);
 
             logger.trace('Public goal added. Preparing response');
             let resBody = response.generatePublicGoalPackageResponseBody(package, false);
             return response.sendOkResponse(res, status.CREATED, 'Successfully published goal', resBody);
         } catch (err) {
-            logger.err(err);
+            logger.error(err);
             if (err.details) logger.err(err.details);
             return response.sendErrorResponse(res, err, 'add public goal');
         }

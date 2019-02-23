@@ -55,24 +55,23 @@ module.exports = {
     PublicGoal,
     PublicGoalPackage,
 
-    merge: async publicGoal => {
+    merge: async publicGoalPackage => {
         try {
             // Some application-level preparation/validation before persisting in the database. Essentially we deep
             // copy the goal before putting it into the database
-            let package = { ...publicGoal };
+            let package = { ...publicGoalPackage, previous: [] };
             package._id = package.id;
             delete package.id;
-            package.latest = { ...publicGoal.latest, tasks: [] };
-            publicGoal.latest.tasks.forEach(t => {
+            package.latest = { ...publicGoalPackage.latest, tasks: [] };
+            publicGoalPackage.latest.tasks.forEach(t => {
                 package.latest.tasks.push(t);
             });
-            package.versions = [];
-            publicGoal.versions.forEach(g => {
+            publicGoalPackage.previous.forEach(g => {
                 let goal = { ...g, tasks: [] };
                 g.tasks.forEach(t => {
                     goal.tasks.push(t);
                 });
-                package.versions.push(goal);
+                package.previous.push(goal);
             });
 
             // Validate the goal before we enter it in the database
@@ -87,7 +86,7 @@ module.exports = {
             // Everything looks good. Merge the changes.
             await db
                 .collection(goalCollectionName)
-                .updateOne({ _id: publicGoal.id }, { $set: package }, { upsert: true });
+                .updateOne({ _id: publicGoalPackage.id }, { $set: package }, { upsert: true });
 
             return true;
         } catch (err) {

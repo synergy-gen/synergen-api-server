@@ -124,8 +124,8 @@ const _module = (module.exports = {
             latest: _module.generatePublicGoalResponseBody(goal.latest, self + '/latest')
         };
         if (!latestOnly) {
-            body.versions = goal.versions.map((v, i) =>
-                _module.generatePublicGoalResponseBody(v, self + '/versions/' + i + 1)
+            body.previous = goal.previous.map((v, i) =>
+                _module.generatePublicGoalResponseBody(v, self + '/previous/' + i + 1)
             );
         }
         return body;
