@@ -48,13 +48,34 @@ A goal is essentially a collection of tasks. Goals are associated either publica
 | `description` | string | a brief description of the goal |
 | `tasks` | Task[] | a list of tasks associated with the goal |
 | `creator` | UUID | the id of the user who created the goal (useful for public goals and tracking adoptions) |
-| `public` | boolean | flag to determine whether the goals has been published or not |
 | `parent` | UUID | the id of the public goal this goal was adopted from. Helpful for tracking stats and other followers. |
-| `adoptions` | number | the number of times the goal has been adopted |
 | `tags` | string[] | tags that can be searched when users are looking for goals |
 | `createDate` | number | the date and time when the goal was created |
-| `targetDate` | number | the date (and time) when the goal should be accomplished (set per user or group) |
 | `updateDate` | number | the date and time when the goal was updated |
+| `beginDate` | number | the date and time when the goal was started
+| `targetDate` | number | the date (and time) when the goal should be accomplished (set per user or group) |
+
+There is a special format for the `goals` collection that allows a user to rollback changes they have made to a public goal, or for users searching the goal to adopt an earlier version of the goal. As such, the physical `goals` collection in the database is structured as follows:
+
+| Name | Type | Description |
+|:---|:---|:---|
+| `_id` | UUID | the id of the goal that has been published. This ID is the same as the id of the goal the user created. |
+| `latest` | PublicGoal | the latest version. Stored separately so searches are done more efficiently on it |
+| `previous` | PublicGoal[] | A list of all previous versions of the goal |
+| `creator` | UUID | the id of the user who created the goal |
+| `tags` | string[] | an array of strings used when searching for the goal |
+| `parent` | UUID | the id of the public goal this goal was templated from (if it was templated) |
+| `publishDate` | number | the date and time when the goal was published |
+| `updateDate` | number| the date and time when the public goal information was updated |
+
+The schema for a PublicGoal is simply the bare necessities for creating a goal:
+
+| Name | Type | Description |
+|:---|:---|:---|
+| `title` | string | the title of the goal |
+| `description` | string | a description of the goal |
+| `tasks` | string[] | the details for each of the tasks associated with the goal |
+| `adoptions` | the number of times this version of the goal has been adopted |
 
 ## Objective
 

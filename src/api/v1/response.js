@@ -81,7 +81,6 @@ const _module = (module.exports = {
     },
 
     generateGoalResponseBody: (goal, selfUrl) => {
-        if (!selfUrl) selfUrl = _module.resource('/goals/' + goal.id);
         return {
             id: goal.id,
             title: goal.title,
@@ -115,6 +114,29 @@ const _module = (module.exports = {
             _links: {
                 self: selfUrl
             }
+        };
+    },
+
+    generatePublicGoalPackageResponseBody: (goal, latestOnly = true) => {
+        let self = _module.resource('/goals/' + goal.id);
+        let body = {
+            id: goal.id,
+            latest: _module.generatePublicGoalResponseBody(goal.latest, self + '/latest')
+        };
+        if (!latestOnly) {
+            body.versions = goal.versions.map((v, i) =>
+                _module.generatePublicGoalResponseBody(v, self + '/versions/' + i + 1)
+            );
+        }
+        return body;
+    },
+
+    generatePublicGoalResponseBody: goal => {
+        return {
+            title: goal.title,
+            description: goal.description,
+            tasks: goal.tasks,
+            adoptions: goal.adoptions
         };
     }
 });

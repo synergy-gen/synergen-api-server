@@ -75,12 +75,15 @@ usersRouter.post(
                 .array()
                 .items(joi.string())
                 .required(),
+            beginDate: joi
+                .number()
+                .integer()
+                .optional(),
             targetDate: joi
                 .number()
                 .integer()
                 .optional(),
-            parent: joi.string().optional(),
-            public: joi.bool().optional()
+            parent: joi.string().optional()
         })
     ),
     handlers.addGoalToUser
@@ -101,6 +104,10 @@ usersRouter.patch(
                     details: joi.string()
                 })
             ),
+            beginDate: joi
+                .number()
+                .integer()
+                .optional(),
             targetDate: joi
                 .number()
                 .integer()
