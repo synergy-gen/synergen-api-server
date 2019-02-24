@@ -1,5 +1,5 @@
 const joi = require('joi');
-const { TaskSchema } = require('./task.db');
+const { TaskSchema } = require('./task.schema');
 
 const GoalSchema = joi.object().keys({
     _id: joi.string().required(),

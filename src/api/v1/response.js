@@ -121,7 +121,12 @@ const _module = (module.exports = {
         let self = _module.resource('/goals/' + goal.id);
         let body = {
             id: goal.id,
-            latest: _module.generatePublicGoalResponseBody(goal.latest, self + '/latest')
+            latest: _module.generatePublicGoalResponseBody(goal.latest, self + '/latest'),
+            creator: goal.creator,
+            tags: goal.tags,
+            parent: goal.parent,
+            updateDate: goal.updateDate,
+            publishDate: goal.publishDate
         };
         if (!latestOnly) {
             body.previous = goal.previous.map((v, i) =>

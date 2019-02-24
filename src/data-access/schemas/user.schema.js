@@ -1,5 +1,5 @@
 const joi = require('joi');
-const { GoalSchema } = require('./goal.db');
+const { GoalSchema } = require('./goal.schema');
 
 const UserSchema = joi.object().keys({
     _id: joi.string().required(),

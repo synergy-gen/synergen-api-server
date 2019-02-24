@@ -1,5 +1,7 @@
-const UserModel = require('../../model/user.model');
-const AuthModel = require('../../model/auth.model');
+const UserModel = require('../../data-access/user.dam');
+const AuthModel = require('../../data-access/auth.dam');
+const { AuthInfo } = require('../../model/auth.model');
+const { User } = require('../../model/user.model');
 const { Goal } = require('../../model/goal.model');
 const { Task } = require('../../model/task.model');
 const response = require('./response');
@@ -27,7 +29,7 @@ const _module = (module.exports = {
             }
 
             logger.trace('Adding new user with username ' + username);
-            user = new UserModel.User(req.body);
+            user = new User(req.body);
             user.lastLogin = Date.now();
             await UserModel.merge(user);
 
@@ -35,7 +37,7 @@ const _module = (module.exports = {
             let salt = crypto.randomBytes(8).toString('hex');
             let algo = _config.hashAlgo;
             let h = security.hash(algo, salt, req.body.password);
-            await AuthModel.merge(new AuthModel.AuthInfo({ user: user.id, salt, algo, hash: h }));
+            await AuthModel.merge(new AuthInfo({ user: user.id, salt, algo, hash: h }));
 
             logger.info('Authentication entry added. Preparing response');
             let resBody = response.generateUserResponseBody(user);

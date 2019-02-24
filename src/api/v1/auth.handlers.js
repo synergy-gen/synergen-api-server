@@ -1,5 +1,5 @@
-const AuthModel = require('../../model/auth.model');
-const UserModel = require('../../model/user.model');
+const AuthModel = require('../../data-access/auth.dam');
+const UserModel = require('../../data-access/user.dam');
 const response = require('./response');
 const status = require('http-status');
 const logger = require('winstonson')(module);

@@ -1,4 +1,4 @@
-const publicGoals = require('../../model/goal.model');
+const publicGoals = require('../../data-access/goal.dam');
 const { PublicGoalPackage } = publicGoals;
 const logger = require('winstonson')(module);
 const response = require('./response');
