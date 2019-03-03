@@ -102,6 +102,10 @@ const _module = (module.exports = {
                 return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user to add goal to');
             }
             let goal = new Goal(req.body);
+            goal.creator = {
+                id: user.id,
+                username: user.username
+            };
             user.goals.push(goal);
             await UserModel.merge(user);
 

@@ -54,7 +54,14 @@ const _module = (module.exports = {
     addPublicGoal: async (req, res) => {
         try {
             logger.info('Adding new public goal');
-            let package = new PublicGoalPackage({ latest: req.body, creator: req.body.creator, tags: req.body.tags });
+            // Get the user
+            let user = await users.find(req.body.creator);
+            if (!user) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user creating goal');
+            let package = new PublicGoalPackage({ latest: req.body, tags: req.body.tags });
+            package.creator = {
+                id: user.id,
+                username: user.username
+            };
             await publicGoals.merge(package);
 
             logger.trace('Public goal added. Preparing response');
@@ -62,7 +69,7 @@ const _module = (module.exports = {
             return response.sendOkResponse(res, status.CREATED, 'Successfully published goal', resBody);
         } catch (err) {
             logger.error(err);
-            if (err.details) logger.err(err.details);
+            if (err.details) logger.error(err.details);
             return response.sendErrorResponse(res, err, 'add public goal');
         }
     },
