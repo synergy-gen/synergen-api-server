@@ -9,7 +9,7 @@ module.exports = {
         try {
             // Some application-level preparation/validation before persisting in the database. Essentially we deep
             // copy the goal before putting it into the database
-            let package = { ...publicGoalPackage, previous: [] };
+            let package = { ...publicGoalPackage, previous: [], creator: publicGoalPackage.creator.id };
             package._id = package.id;
             delete package.id;
             package.latest = { ...publicGoalPackage.latest, tasks: [] };
@@ -50,8 +50,11 @@ module.exports = {
             let doc = await db.collection(goalCollectionName).findOne({ _id: id });
             if (!doc) return null;
             // Map the creator ID to username
-            let creator = await _module.find(doc.creator);
-            doc.creator = creator.username;
+            let creator = await users.find(doc.creator);
+            doc.creator = {
+                id: creator.id,
+                username: creator.username
+            };
 
             return new PublicGoalPackage(doc);
         } catch (err) {
@@ -70,7 +73,10 @@ module.exports = {
             for (let package of doc) {
                 // Map the creator ID to username
                 let creator = await users.find(package.creator);
-                package.creator = creator.username;
+                package.creator = {
+                    id: creator.id,
+                    username: creator.username
+                };
                 results.push(new PublicGoalPackage(package));
             }
             return results();
@@ -111,7 +117,10 @@ module.exports = {
             for (let res of results) {
                 // Map the creator ID to username
                 let creator = await users.find(res.creator);
-                res.creator = creator.username;
+                res.creator = {
+                    id: creator.id,
+                    username: creator.username
+                };
                 docs.push(new PublicGoalPackage(res));
             }
 

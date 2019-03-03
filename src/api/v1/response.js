@@ -86,7 +86,7 @@ const _module = (module.exports = {
             title: goal.title,
             description: goal.description,
             tasks: goal.tasks.map(task => _module.generateTaskResponseBody(task, selfUrl + '/tasks/' + task.id)),
-            creator: goal.creator,
+            creator: goal.creator.username,
             public: goal.public,
             adoptions: goal.adoptions,
             parent: goal.parent,
@@ -122,7 +122,7 @@ const _module = (module.exports = {
         let body = {
             id: goal.id,
             latest: _module.generatePublicGoalResponseBody(goal.latest, self + '/latest'),
-            creator: goal.creator,
+            creator: goal.creator.username,
             tags: goal.tags,
             parent: goal.parent,
             updateDate: goal.updateDate,

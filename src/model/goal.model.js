@@ -10,7 +10,10 @@ class Goal {
         if (this.tasks.length > 0 && !(this.tasks[0] instanceof Task)) {
             this.tasks = this.tasks.map(t => new Task(t));
         }
-        this.creator = props.creator || null;
+        this.creator = {
+            id: props.creator ? props.creator.id || null : null,
+            username: props.creator ? props.creator.username || null : null
+        };
         this.parent = props.parent || null;
         this.tags = props.tags || [];
         this.createDate = props.createDate || Date.now();
@@ -37,7 +40,10 @@ class PublicGoalPackage {
         if (props.previous && Array.isArray(props.previous)) {
             this.previous = props.previous.map(g => new PublicGoal(g));
         }
-        this.creator = props.creator || null;
+        this.creator = {
+            id: props.creator ? props.creator.id || null : null,
+            username: props.creator ? props.creator.username || null : null
+        };
         this.tags = props.tags || [];
         this.parent = props.parent || null;
         this.publishDate = props.publishDate || Date.now();

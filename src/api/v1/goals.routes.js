@@ -44,4 +44,11 @@ goalsRouter.post(
     handlers.addPublicGoal
 );
 
+goalsRouter.post(
+    '/goals/:id/adoptions',
+    authorizeRequest,
+    validateRequest('adopt goal', joi.object().keys({ uid: joi.string().required() })),
+    handlers.adoptPublicGoal
+);
+
 module.exports = goalsRouter;

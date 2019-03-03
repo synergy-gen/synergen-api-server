@@ -10,7 +10,7 @@ const _module = (module.exports = {
             userObj._id = userObj.id;
             delete userObj.id;
             userObj.goals = user.goals.map(g => {
-                let goal = { ...g, tasks: [] };
+                let goal = { ...g, tasks: [], creator: g.creator.id };
                 goal._id = goal.id;
                 delete goal.id;
                 goal.tasks = g.tasks.map(t => {
@@ -44,11 +44,17 @@ const _module = (module.exports = {
             if (!doc) return null;
             // Map the creator IDs to usernames
             for (let goal of doc.goals) {
-                if (doc._id !== id) {
+                if (doc._id !== goal.creator) {
                     let creator = await _module.find(goal.creator);
-                    goal.creator = creator.username;
+                    goal.creator = {
+                        id: creator.id,
+                        username: creator.username
+                    };
                 } else {
-                    goal.creator = doc.username;
+                    goal.creator = {
+                        id,
+                        username: doc.username
+                    };
                 }
             }
             return new User(doc);
@@ -63,11 +69,17 @@ const _module = (module.exports = {
             if (!doc) return null;
             // Map the creator IDs to usernames
             for (let goal of doc.goals) {
-                if (doc.username !== username) {
+                if (doc._id !== goal.creator) {
                     let creator = await _module.find(goal.creator);
-                    goal.creator = creator.username;
+                    goal.creator = {
+                        id: creator.id,
+                        username: creator.username
+                    };
                 } else {
-                    goal.creator = username;
+                    goal.creator = {
+                        id: doc._id,
+                        username
+                    };
                 }
             }
             return new User(doc);

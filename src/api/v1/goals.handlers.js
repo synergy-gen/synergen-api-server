@@ -1,5 +1,6 @@
 const publicGoals = require('../../data-access/goal.dam');
-const { PublicGoalPackage } = publicGoals;
+const users = require('../../data-access/user.dam');
+const { PublicGoalPackage, Goal } = require('../../model/goal.model');
 const logger = require('winstonson')(module);
 const response = require('./response');
 const status = require('http-status');
@@ -68,5 +69,35 @@ const _module = (module.exports = {
 
     updatePublicGoal: async (req, res) => {},
 
-    deletePublicGoal: async (req, res) => {}
+    deletePublicGoal: async (req, res) => {},
+
+    adoptPublicGoal: async (req, res) => {
+        try {
+            // Fetch the goal
+            let package = await publicGoals.find(req.params.id);
+            if (!package) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find goal to adopt');
+
+            // Fetch the user who wants to update the goal
+            let user = await users.find(req.body.uid);
+            if (!user) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user to adopt goal');
+
+            // Add the goal to the user
+            let goal = new Goal(package.latest);
+            goal.creator = package.creator;
+            user.goals.push(goal);
+            await users.merge(user);
+
+            // Update the adoptions of the goal
+            package.latest.adoptions++;
+            await publicGoals.merge(package);
+
+            let body = response.generateGoalResponseBody(goal, `/users/${req.body.uid}/goals/${goal.id}`);
+
+            return response.sendOkResponse(res, status.OK, 'Successfully adopted goal', body);
+        } catch (err) {
+            logger.error(err);
+            if (err.details) logger.error(err.details);
+            return response.sendErrorResponse(res, err, 'adopt goal');
+        }
+    }
 });
