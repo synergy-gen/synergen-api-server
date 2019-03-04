@@ -42,21 +42,11 @@ const _module = (module.exports = {
         try {
             let doc = await db.collection(userCollectionName).findOne({ _id: id });
             if (!doc) return null;
+
             // Map the creator IDs to usernames
-            for (let goal of doc.goals) {
-                if (doc._id !== goal.creator) {
-                    let creator = await _module.find(goal.creator);
-                    goal.creator = {
-                        id: creator.id,
-                        username: creator.username
-                    };
-                } else {
-                    goal.creator = {
-                        id,
-                        username: doc.username
-                    };
-                }
-            }
+            let creators = { [id]: doc.username };
+            await mapGoalCreatorsToUsernames(doc, creators);
+
             return new User(doc);
         } catch (err) {
             throw new SynergenError(`Failed to retrieve user information for user with id ${id}: ${err.message}`);
@@ -67,21 +57,11 @@ const _module = (module.exports = {
         try {
             let doc = await db.collection(userCollectionName).findOne({ username });
             if (!doc) return null;
+
             // Map the creator IDs to usernames
-            for (let goal of doc.goals) {
-                if (doc._id !== goal.creator) {
-                    let creator = await _module.find(goal.creator);
-                    goal.creator = {
-                        id: creator.id,
-                        username: creator.username
-                    };
-                } else {
-                    goal.creator = {
-                        id: doc._id,
-                        username
-                    };
-                }
-            }
+            let creators = { [doc._id]: username };
+            await mapGoalCreatorsToUsernames(doc, creators);
+
             return new User(doc);
         } catch (err) {
             throw new SynergenError(
@@ -100,3 +80,34 @@ const _module = (module.exports = {
         }
     }
 });
+
+async function mapGoalCreatorsToUsernames(doc, creators = {}) {
+    try {
+        for (let goal of doc.goals) {
+            goal.creator = await findCreator(goal.creator, creators);
+        }
+    } catch (err) {
+        throw new SynergenError('Failed to map goal creators to usernames: ' + err.message);
+    }
+}
+
+async function findCreator(creator, creators) {
+    try {
+        if (!creators[creator]) {
+            let doc = await db.collection(userCollectionName).findOne({ _id: creator });
+            if (!doc) return null;
+            creators[creator.id] = creator.username;
+            return {
+                id: doc._id,
+                username: doc.username
+            };
+        } else {
+            return {
+                id: creator,
+                username: creators[creator]
+            };
+        }
+    } catch (err) {
+        throw new SynergenError('Failed to find goal creator with id ' + creator + ': ' + err.message);
+    }
+}
