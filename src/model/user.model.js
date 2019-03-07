@@ -14,7 +14,12 @@ class User {
             this.goals = this.goals.map(g => new Goal(g));
         }
         // TODO: add objectives to user model
+        this.avatar = {
+            file: props.avatar ? props.avatar.file || null : null,
+            mime: props.avatar ? props.avatar.mime || null : null
+        };
         this.createDate = props.createDate || Date.now();
+        this.updateDate = props.updateDate || null;
     }
 }
 

@@ -10,7 +10,8 @@ const logger = require('winstonson')(module);
 const crypto = require('crypto');
 const config = require('config');
 const security = require('../../util/security');
-const _config = config.get('security');
+const files = require('../../util/files');
+const configSecurity = config.get('security');
 
 const _module = (module.exports = {
     addNewUser: async (req, res) => {
@@ -35,7 +36,7 @@ const _module = (module.exports = {
 
             logger.info('Added user. Generating authentication entry');
             let salt = crypto.randomBytes(8).toString('hex');
-            let algo = _config.hashAlgo;
+            let algo = configSecurity.hashAlgo;
             let h = security.hash(algo, salt, req.body.password);
             await AuthModel.merge(new AuthInfo({ user: user.id, salt, algo, hash: h }));
 
@@ -80,6 +81,7 @@ const _module = (module.exports = {
                 logger.info('User not found');
                 return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user to update');
             }
+
             await UserModel.merge({ ...user, ...req.body });
 
             logger.trace('User updated. Preparing and sending response');
@@ -90,6 +92,51 @@ const _module = (module.exports = {
             logger.error(err);
             if (err.details) logger.err(err.details);
             return response.sendErrorResponse(res, err, 'save user');
+        }
+    },
+
+    updateUserAvatar: async (req, res) => {
+        try {
+            // We have already guaranteed size and parsed the raw content into a Buffer.
+            // Get the user
+            let user = await UserModel.find(req.params.id);
+            if (!user)
+                return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user to update avatar for');
+
+            // Write the file
+            let file = req.params.id;
+            await files.writeFileTo('avatars', file, req.body);
+
+            // Update the user
+            user.avatar.file = file;
+            user.avatar.mime = req.header('Content-Type');
+            await UserModel.merge(user);
+
+            return response.sendOkResponse(res, status.OK, 'Successfully saved avatar image', {
+                location: response.resource(`/users/${user.id}/avatar`)
+            });
+        } catch (err) {
+            logger.error(err);
+            if (err.details) logger.error(err.details);
+            return response.sendErrorResponse(res, status.INTERNAL_SERVER_ERROR, 'Failed to save avatar image');
+        }
+    },
+
+    getUserAvatar: async (req, res) => {
+        try {
+            // Fetch the user
+            let user = await UserModel.find(req.params.id);
+            if (!user) return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user');
+
+            // Locate and load the avatar binary
+            let data = await files.readFileFrom('avatars', user.avatar.file);
+
+            // Respond with the data
+            res.header('Content-Type', user.avatar.mime);
+            res.status(status.OK).end(data, 'binary');
+        } catch (err) {
+            logger.error(err);
+            return response.sendErrorResponse(res, err, 'Failed to fetch avatar image file');
         }
     },
 

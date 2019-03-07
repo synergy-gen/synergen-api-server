@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('./src/util/db-connection');
+const files = require('./src/util/files');
 const config = require('config');
 const api = require('./src/api/v1/routes');
 const morgan = require('morgan');
@@ -29,6 +30,9 @@ db.connect(err => {
     );
 
     app.use(api);
+
+    // Set up static file serving dynamically based on configuration
+    files.init();
 
     app.use((req, res) => {
         res.status(400).send('Bad request');

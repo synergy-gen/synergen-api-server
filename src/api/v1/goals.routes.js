@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const handlers = require('./goals.handlers');
 const validateRequest = require('./validate');
 const joi = require('joi');
@@ -7,6 +8,8 @@ const passport = require('passport');
 const goalsRouter = express.Router();
 
 const authorizeRequest = passport.authenticate('jwt', { session: false });
+
+const parseJsonBody = bodyParser.json();
 
 goalsRouter.get(
     '/goals',
@@ -25,6 +28,7 @@ goalsRouter.get(
 goalsRouter.post(
     '/goals',
     authorizeRequest,
+    parseJsonBody,
     validateRequest(
         'publish goal',
         joi.object().keys({
@@ -47,6 +51,7 @@ goalsRouter.post(
 goalsRouter.post(
     '/goals/:id/adoptions',
     authorizeRequest,
+    parseJsonBody,
     validateRequest('adopt goal', joi.object().keys({ uid: joi.string().required() })),
     handlers.adoptPublicGoal
 );

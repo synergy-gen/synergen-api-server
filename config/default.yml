@@ -17,6 +17,10 @@ server:
         scheme: http
         host: localhost
         port: 8585
+    files:
+        - name: avatars
+          path: public/avatars
+          url: /public/avatars
 
 # Default security configurations. These are mainly used to assist with creation/verification of JSON Web Tokens
 # to authenticate requests
@@ -26,4 +30,3 @@ security:
         audience: synergen.com/api
         issuer: synergen.com
         secretKey: /etc/secrets/private.key
-

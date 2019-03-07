@@ -3,7 +3,9 @@ const ErrorCodes = require('../../util/error').SynergenError.Codes;
 const config = require('config').get('server').api;
 const apiVersion = 'v1';
 
-const apiBase = `${config.scheme}://${config.host}${config.port ? ':' + config.port : ''}/api/${apiVersion}`;
+const base = `${config.scheme}://${config.host}${config.port ? ':' + config.port : ''}`;
+
+const apiBase = `${base}/api/${apiVersion}`;
 
 const _module = (module.exports = {
     resource: path => apiBase + path,
@@ -75,7 +77,8 @@ const _module = (module.exports = {
             _links: {
                 self,
                 goals: self + '/goals',
-                objectives: self + '/objectives'
+                objectives: self + '/objectives',
+                avatar: user.avatar.file ? self + '/avatar' : null
             }
         };
     },

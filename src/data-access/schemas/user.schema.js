@@ -23,6 +23,16 @@ const UserSchema = joi.object().keys({
         .array()
         .items(GoalSchema)
         .required(),
+    avatar: joi.object().keys({
+        file: joi
+            .string()
+            .required()
+            .allow(null),
+        mime: joi
+            .string()
+            .required()
+            .allow(null)
+    }),
     createDate: joi.number().integer(),
     updateDate: joi
         .number()

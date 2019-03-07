@@ -2,6 +2,7 @@
 config/local*
 etc/secrets/*
 !etc/secrets/README.md
+public/
 
 # Logs
 logs
