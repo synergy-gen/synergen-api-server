@@ -68,6 +68,7 @@ const _module = (module.exports = {
             name: user.name,
             username: user.username,
             email: user.email,
+            slogan: user.slogan,
             lastLogin: user.lastLogin,
             goals: user.goals.map(goal => _module.generateGoalResponseBody(goal, self + '/goals/' + goal.id)),
             objectives: [],

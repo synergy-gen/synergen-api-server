@@ -59,7 +59,8 @@ usersRouter.patch(
             email: joi
                 .string()
                 .email()
-                .optional()
+                .optional(),
+            slogan: joi.string()
         })
     ),
     handlers.updateUser

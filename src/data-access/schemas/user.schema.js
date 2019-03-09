@@ -15,6 +15,10 @@ const UserSchema = joi.object().keys({
         .string()
         .email()
         .required(),
+    slogan: joi
+        .string()
+        .required()
+        .allow(null),
     lastLogin: joi
         .number()
         .integer()

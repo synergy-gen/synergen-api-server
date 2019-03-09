@@ -82,7 +82,9 @@ const _module = (module.exports = {
                 return response.sendErrorResponse(res, status.NOT_FOUND, 'Failed to find user to update');
             }
 
-            await UserModel.merge({ ...user, ...req.body });
+            user = { ...user, ...req.body };
+
+            await UserModel.merge(user);
 
             logger.trace('User updated. Preparing and sending response');
             let resBody = response.generateUserResponseBody(user);
@@ -157,7 +159,6 @@ const _module = (module.exports = {
             await UserModel.merge(user);
 
             logger.trace('Goal successfully added, preparing response');
-            goal.creator = user.username;
             let userUrl = response.resource('/users/' + req.params.id);
             let body = response.generateGoalResponseBody(goal, userUrl + '/goals/' + goal.id);
             return response.sendOkResponse(res, status.CREATED, 'Successfully added new goal to user', body);

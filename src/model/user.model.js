@@ -8,6 +8,7 @@ class User {
         this.username = props.username;
         this.name = props.name;
         this.email = props.email;
+        this.slogan = props.slogan || null;
         this.lastLogin = props.lastLogin;
         this.goals = props.goals || [];
         if (this.goals.length > 0 && !(this.goals[0] instanceof Goal)) {
