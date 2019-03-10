@@ -100,7 +100,7 @@ module.exports = {
                 reject(new Error('Failed to write data to file: ' + err.message));
             });
 
-            output.on('end', () => {
+            output.on('finish', () => {
                 resolve(location);
             });
 
