@@ -95,6 +95,7 @@ async function findCreator(creator, creators) {
     try {
         if (!creators[creator]) {
             let doc = await db.collection(userCollectionName).findOne({ _id: creator });
+            if (!doc) doc = await db.collection(userCollectionName).findOne({ username: creator });
             if (!doc) return null;
             creators[creator.id] = creator.username;
             return {
