@@ -117,10 +117,18 @@ module.exports = {
             for (let res of results) {
                 // Map the creator ID to username
                 let creator = await users.find(res.creator);
-                res.creator = {
-                    id: creator.id,
-                    username: creator.username
-                };
+                if (creator) {
+                    res.creator = {
+                        id: creator.id,
+                        username: creator.username
+                    };
+                } else {
+                    res.creator = {
+                        id: 'unknown',
+                        username: 'unknown'
+                    };
+                }
+
                 docs.push(new PublicGoalPackage(res));
             }
 

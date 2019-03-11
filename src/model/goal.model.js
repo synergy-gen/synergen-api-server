@@ -24,7 +24,7 @@ class Goal {
 }
 
 class PublicGoal {
-    constructor(props) {
+    constructor(props = {}) {
         this.title = props.title || '';
         this.description = props.description || '';
         this.tasks = props.tasks || [];
@@ -33,7 +33,7 @@ class PublicGoal {
 }
 
 class PublicGoalPackage {
-    constructor(props) {
+    constructor(props = {}) {
         this.id = props.id || props._id || shortid.generate();
         this.latest = props.latest ? new PublicGoal(props.latest) : null;
         this.previous = [];

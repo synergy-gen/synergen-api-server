@@ -1,37 +1,37 @@
 const fs = require('fs');
 const readline = require('readline');
-const config = require('config');
-const mongoose = require('mongoose');
 const path = require('path');
-const UserModel = require('../../src/model/user.model');
-const GoalModel = require('../../src/model/goal.model');
-const { Task } = require('../../src/model/task.model');
-const TagModel = require('../../src/model/tag.model');
+const db = require('../../src/util/db-connection');
+const { User } = require('../../src/model/user.model');
+const users = require('../../src/data-access/user.dam');
+const { PublicGoalPackage, PublicGoal } = require('../../src/model/goal.model');
+const packages = require('../../src/data-access/goal.dam');
 
 const userFile = path.join(__dirname, 'users.txt');
-const goalsFile = path.join(__dirname, 'goals.txt');
+const goalsFile = path.join(__dirname, 'goals-0.txt');
 
-// Keep track of users and tags we can use them later
-let users = [];
-let tags = new Set();
+let createdUsers = [];
 let promises = [];
-// Connect to the database
-const databaseConfig = config.get('database');
-const mongoUrl = `mongodb://${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.name}`;
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useFindAndModify: false });
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB at ' + mongoUrl);
+
+db.connect(err => {
+    if (err) {
+        console.log(err);
+        process.exit(1);
+    }
+    console.log('Connected to DB');
     seed()
         .then(() => Promise.all(promises))
-        .then(() => db.close())
-        .catch(err =>
+        .then(() => {
+            console.log('Successfully seeded the database');
+            db.close();
+        })
+        .catch(err => {
             console.log(
                 'Failed to seed database entirely: ' + err.message + '. The database may have been partially seeded',
                 err
-            )
-        );
+            );
+            db.close();
+        });
 });
 
 async function seed() {
@@ -41,9 +41,6 @@ async function seed() {
     // We have users to use. Seed the goals
     console.log('   Seeding goals');
     await seedGoals();
-    // Use the tags from the goals to seed a tag list
-    console.log('   Seeding tags');
-    await seedTags();
 }
 
 function seedUsers() {
@@ -52,13 +49,15 @@ function seedUsers() {
     });
     return new Promise((resolve, reject) => {
         interface.on('line', line => {
-            let user = new UserModel.User({
+            let user = new User({
                 name: line,
-                username: 'dtest' + line.toLowerCase().replace(/[\s\.\-\_]/, '')
+                username: 'dv' + line.toLowerCase().replace(/[\s\.\-\_]/, ''),
+                email: 'dtest@example.com',
+                lastLogin: Date.now()
             });
-            let p = UserModel.merge(user).catch(err => reject(err));
+            let p = users.merge(user).catch(err => reject(err));
             promises.push(p);
-            users.push(user);
+            createdUsers.push({ id: user.id, username: user.username });
         });
         interface.on('close', () => resolve());
     });
@@ -70,17 +69,18 @@ function seedGoals() {
     });
     return new Promise((resolve, reject) => {
         let state = 0;
-        let goal = new GoalModel.Goal();
+        let goal = new PublicGoalPackage();
+        goal.latest = new PublicGoal();
         let error = false;
         interface.on('line', line => {
             if (line !== '') {
                 switch (state) {
                     case 0: // Reading the title
-                        goal.title = line;
+                        goal.latest.title = line;
                         state++;
                         break;
                     case 1: // Reading the description
-                        goal.description = line;
+                        goal.latest.description = line;
                         state++;
                         break;
                     case 2: // Reading the tags
@@ -88,11 +88,8 @@ function seedGoals() {
                         state++;
                         break;
                     case 3: // Reading tasks
-                        let parts = line.split('|');
-                        let details = parts[0].trim();
-                        let type = parts.length > 1 ? parts[1].trim() : Task.Types.CHECK;
-                        let task = new Task({ details, type });
-                        goal.tasks.push(task);
+                        let details = line.trim();
+                        goal.latest.tasks.push(details);
                         break;
                     default:
                         // Should never get here
@@ -101,28 +98,27 @@ function seedGoals() {
                         return reject(new Error('State corruption: entered state ' + state));
                 }
             } else {
-                // We finished parsing a goal. Save it and its tags
-                goal.tags.forEach(t => tags.add(t));
                 // Pick a random user to be the creator for the goal
-                let i = Math.floor(Math.random() * users.length);
-                goal.creator = users[i].id;
+                let i = Math.floor(Math.random() * createdUsers.length);
+                goal.creator = createdUsers[i];
                 // Pick a random number of adoptions
-                goal.adoptions = Math.floor(Math.random() * 50);
+                goal.latest.adoptions = Math.floor(Math.random() * 50);
                 // Write the goal
-                let p = GoalModel.merge(goal).catch(err => reject(err));
+                let p = packages.merge(goal).catch(err => {
+                    if (!error) {
+                        error = true;
+                        reject(err);
+                    }
+                });
                 promises.push(p);
                 // Reset the state
                 state = 0;
-                goal = new GoalModel.Goal();
+                goal = new PublicGoalPackage();
+                goal.latest = new PublicGoal();
             }
         });
         interface.on('close', () => {
             if (!error) return resolve();
         });
     });
-}
-
-function seedTags() {
-    // We gathered all our tags from the goals. Add them to the database
-    return TagModel.mergeAll(Array.from(tags));
 }
