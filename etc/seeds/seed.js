@@ -84,7 +84,7 @@ function seedGoals() {
                         state++;
                         break;
                     case 2: // Reading the tags
-                        goal.tags = line.split(',');
+                        goal.tags = line.split(',').map(t => t.trim());
                         state++;
                         break;
                     case 3: // Reading tasks
