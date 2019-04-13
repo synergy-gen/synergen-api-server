@@ -1,31 +1,26 @@
 {
-  "name": "@synergen/api-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "synergen-api-server",
+  "version": "2.0.0",
+  "description": "RESTful API server for the Synergen service",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "debug": "node --inspect index.js",
-    "seed": "node etc/seeds/seed.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/synergy-gen/synergen-api-server.git"
+  },
+  "author": "Braden Hitchcock <developer.hitchcock@gmail.com>",
   "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/synergy-gen/synergen-api-server/issues"
+  },
+  "homepage": "https://github.com/synergy-gen/synergen-api-server#readme",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "bytes": "^3.1.0",
-    "config": "^3.0.1",
-    "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
-    "http-status": "^1.3.1",
     "joi": "^14.3.1",
-    "js-yaml": "^3.12.1",
-    "jsonwebtoken": "^8.4.0",
-    "mongodb": "^3.1.13",
-    "morgan": "^1.9.1",
+    "moment": "^2.24.0",
     "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0",
-    "shortid": "^2.2.14",
-    "winstonson": "^1.2.2"
+    "uuid": "^3.3.2"
   }
 }

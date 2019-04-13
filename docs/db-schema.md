@@ -1,45 +1,66 @@
 # Database Schema for Synergen
+Synergen uses a NoSQL database to persist user data. This document describes the schema for how that data should be stored. The database will comprise of five collections.
+- An `auth` collection for managing authentication data
+- A `users` collection containing User data
+- A `packages` collection containing public goal and objective data
+- A `groups` collection containing available group information
+- A `stats` collection housing statistical data for goals and objectives based on user input
 
-Synergen uses a NoSQL database to persist user data. This document describes the schema for how that data should be stored. The database will comprise of four collections.
-- A `users` collection containing User data (User[])
-- A `goals` collection containing public goal data (Goal[])
-- A `objectives` collection containing public objective data (Objective[])
-- A `groups` collection containing available group information (Group[])
+There are several schemas defined below:
+- AuthInfo
+- User
+- Package
+- Group
+- Objective
+- Goal
+- Task
 
-The schema of the objects stored in each collection are defined below. Additional metadata for each object may be defined as development progresses.
+## AuthInfo
+This object contains information required to perform authentication for users when they sign into the service
+
+| Name | Type | Description |
+|:---|:---|:---|
+| `_id` | UUID | the unique identifier for the info |
+| `user` | UUID | the ID of the user associated with the information |
+| `salt` | string | the salt used when computing the password hash |
+| `hash` | string | the hash computed from the user's password |
+| `mode` | string | the name of the hash mode used to compute the hash |
+
 
 ## User
-
 A user is any person using the system. A user has the following attributes:
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `_id` | UUID | |
+| `_id` | UUID | the unique identifier for the user |
+| `username` | string | a unique, user-defined string associated with the user |
+| `validated` | bool | a flag indicating whether the user identity has been validated |
+| `seenSystemMessage` | number | the number of the last system message seen by the user |
 | `name` | string | the name of the user |
-| `username` | string | the username defined by the user that can uniquely identify this user. Mutable. |
+| `slogan` | string | a slogan set by the user |
 | `email` | string | the email address of the user |
-| `lastLogin` | UNIX timestamp | a record of the last time the user accessed the service |
+| `phone` | string | the phone number of the user |
+| `avatar.mime` | string | the MIME type of the avatar image |
+| `avatar.file` | string | the location of the avatar image file |
 | `goals` | Goal[] | an array of goals private to the user. Includes adopted goals. |
 | `objectives` | Objective[] | an array of objectives private to the user. Includes adopted goals. |
+| `friends` | UUID[] | a lisit of user IDs corresponding to this user's friends |
 | `createDate` | number |the date when the user was created |
 | `updateDate` | number| the date and time when the user's profile was last updated |
-| `active` | boolean | flag to confirm whether the user's email has been verified |
+| `lastLogin` | UNIX timestamp | a record of the last time the user accessed the service |
 
 ## Task
-
 A task is the smallest unit of data in the Synergen service. It has the following attributes:
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `_id` | UUID | |
+| `_id` | UUID | the unique identifier for the task |
 | `details` | string | the details of the task |
-| `type` | string | the type of task (defaults to `check`) |
 | `createDate` | number | the date when the task was created |
 | `updateDate` | number | the date and time when the task was updated |
 
 ## Goal
-
-A goal is essentially a collection of tasks. Goals are associated either publically (in the `goals` collection), with a user (in the `users` collection under a User entry), or with a group (in the `groups` collection under a Group entry). A goal has the following attributes:
+A goal is essentially a collection of tasks. A goal has the following attributes:
 
 | Name | Type | Description |
 |:---|:---|:---|
@@ -48,13 +69,13 @@ A goal is essentially a collection of tasks. Goals are associated either publica
 | `description` | string | a brief description of the goal |
 | `tasks` | Task[] | a list of tasks associated with the goal |
 | `creator` | UUID | the id of the user who created the goal (useful for public goals and tracking adoptions) |
-| `parent` | UUID | the id of the public goal this goal was adopted from. Helpful for tracking stats and other followers. |
+| `parent.id` | UUID | if adopted, the ID of the package from which it was adopted |
+| `parent.version` | string | if adopted, the version of the parent from which this goal was adopted |
 | `tags` | string[] | tags that can be searched when users are looking for goals |
-| `createDate` | number | the date and time when the goal was created |
-| `updateDate` | number | the date and time when the goal was updated |
-| `beginDate` | number | the date and time when the goal was started
-| `targetDate` | number | the date (and time) when the goal should be accomplished (set per user or group) |
+| `createDate` | date | the date and time when the goal was created |
+| `updateDate` | date | the date and time when the goal was updated |
 
+## Package
 There is a special format for the `goals` collection that allows a user to rollback changes they have made to a public goal, or for users searching the goal to adopt an earlier version of the goal. As such, the physical `goals` collection in the database is structured as follows:
 
 | Name | Type | Description |
